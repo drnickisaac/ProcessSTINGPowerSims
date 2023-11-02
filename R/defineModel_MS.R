@@ -1,28 +1,33 @@
-#' defineModel
+#' defineModel_MS
 #'
 #' @details Defines the Nimble model.
 #' @return a set of code
 #' @import nimble
 #' @export
 
-defineModel <- function(inclPhenology = TRUE,
+defineModel_MS <- function(inclPhenology = TRUE,
                         inclPanTrap = TRUE){
 
   modelcode <- nimbleCode({
     ######################### state model
-    for(i in 1:nsp) {
+    for(i in 1:nsp){
       for(j in 1:nsite) {
-        linPred[i,j] <- alpha.s[i] + eta[j]
-        log(lambda[i,j]) <- linPred[i,j]
-        cloglog(psi[i,j]) <- linPred[i,j]
-        z[i,j] ~ dbern(psi[i,j]) # True occupancy status
-        # need to add in a temporal component
-    }}
+        for(t in 1:nyear){
+          linPred[i,j,t] <- alpha.s[i] + Trend * t  + spTr[i] * t + eta[j]
+          log(lambda[i,j,t]) <- linPred[i,j,t]
+          cloglog(psi[i,j,t]) <- linPred[i,j,t]
+          z[i,j,t] ~ dbern(psi[i,j,t]) # True occupancy status
+    }}}
 
     ######################### state model priors
-    for(i in 1:nsp) {alpha.s[i] ~ dnorm(0, 0.0001)}
+    for(i in 1:nsp) {
+      alpha.s[i] ~ dnorm(0, sd=0.0001)
+      spTr[i] ~ dnorm(0, sd=simga.trend)
+    }
     for(j in 1:nsite) {eta[j] ~ dnorm(0, tau.eta)} # site-level random effect
     tau.eta ~ T(dt(0, 1, 1), 0, Inf) # Half Cauchy
+    sigma.trend ~ T(dt(0, 1, 1), 0, Inf) # Half Cauchy
+    Trend ~ dnorm(0, sd=0.0001)
 
     ######################### Obs model
     for(i in 1:nsp){
@@ -30,9 +35,9 @@ defineModel <- function(inclPhenology = TRUE,
           ##### pan traps
           if(inclPanTrap){
             y1[i,k] ~ dbin(size = nT[k], prob = Py[i,k]) # Observed data
-            Py[i,k] <- z[i,site[k]] * p1[i,k]
+            Py[i,k] <- z[i,site[k], year[k]] * p1[i,k]
             p1[i,k] <- alpha.p[i] * pThin[i,k]
-          } # NEED TO ADD A SITE TERM IN HERE to the detectability element
+          } # Should I add site + year effects to detectability?
 
           ##### transects
           y2[i,k] ~ dpois(lambdaThin[i,k]) # Observed counts. Might need a NegBin here or Zero-inflated

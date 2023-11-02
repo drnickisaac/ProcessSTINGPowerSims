@@ -1,8 +1,6 @@
 #' runModel
 #'
-#' @details
-#' Runs the model.
-#'
+#' @details Runs the model.
 #' @param dataConstants dataframe produced by ProcessSimDatFile()
 #' @param obsData dataframe produced by ProcessSimDatFile()
 #' @param dataSumm dataframe produced by ProcessSimDatFile()
@@ -10,10 +8,11 @@
 #' @param n.iter number of iterations for the Nimble model
 #' @param inclPhenology should the model account for seasonal variation?
 #' @param inclPanTrap should the model include pan trap data?
-#'
 #' @return a set of year effects
 #' @import nimble
 #' @export
+
+# NEED  TO FIGURE OUT HOW TO DO THIS FOR A SINGLE SPECIES OPTION
 
 runModel <- function(dataConstants,
                      obsData,
@@ -36,7 +35,7 @@ runModel <- function(dataConstants,
 
     ###################################################################
     # step 1 define the model code
-    modelcode <- defineModel(inclPhenology = inclPhenology, inclPanTrap = inclPanTrap) # this makes no difference!
+    modelcode <- defineModel_MS(inclPhenology = inclPhenology, inclPanTrap = inclPanTrap) # this makes no difference!
 
     # step 2 create an operational from from NIMBLE/JAGS/BUGS code
     model <- nimbleModel(code = modelcode,
@@ -53,18 +52,16 @@ runModel <- function(dataConstants,
 
     # step 3 build an MCMC object using buildMCMC(). we can add some customization here
     occMCMC <- buildMCMC(model,
-                       monitors = c("mu.lambda", "psi.fs"#,
+                       monitors = c("mu.lambda", "psi.fs",
                                     #'alpha.s', "beta.s",
                                     #'alpha.p', "phScale","Multiplier",
                                     #"beta1", "beta2"
-                                    ),
+                                    Trend),
                        thin = 3,
                        useConjugacy = FALSE) # useConjugacy controls whether conjugate samplers are assigned when possible
-  #about 5 seconds
 
   # step 3 before compiling the MCMC object we need to compile the model first
   Cmodel <- compileNimble(model) # NJBI: I don't understand why this step is necessary
-  # 25 seconds (less for fewer nodes)
 
   # now the MCMC (project = NIMBLE model already associated with a project)
   CoccMCMC <- compileNimble(occMCMC, project = model)
