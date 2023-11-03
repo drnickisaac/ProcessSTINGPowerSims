@@ -27,7 +27,7 @@ runModel <- function(dataConstants,
       if(dim(obsData$y1)[1] > maxSp){
         obsData <- lapply(obsData, function(x) x[1:maxSp,])
         dataConstants$nsp <- maxSp
-        dataSumm$occMatrix <- dataSumm$occMatrix[1:maxSp,]
+        dataSumm$occMatrix <- dataSumm$occMatrix[1:maxSp,,]
   }
 
   ###################################################################
@@ -52,11 +52,11 @@ runModel <- function(dataConstants,
 
     # step 3 build an MCMC object using buildMCMC(). we can add some customization here
     occMCMC <- buildMCMC(model,
-                       monitors = c("mu.lambda", "psi.fs",
+                       monitors = c(#"mu.lambda", "psi.fs",
                                     #'alpha.s', "beta.s",
                                     #'alpha.p', "phScale","Multiplier",
                                     #"beta1", "beta2"
-                                    Trend),
+                                    "Trend"),
                        thin = 3,
                        useConjugacy = FALSE) # useConjugacy controls whether conjugate samplers are assigned when possible
 
@@ -95,7 +95,7 @@ runModel <- function(dataConstants,
                                         #'alpha.s', "beta.s",
                                         #'alpha.p', "phScale","Multiplier",
                                         #"beta1", "beta2"
-                                        Trend),
+                                        "Trend"),
                            thin = 3,
                            useConjugacy = FALSE) # useConjugacy controls whether conjugate samplers are assigned when possible
 
