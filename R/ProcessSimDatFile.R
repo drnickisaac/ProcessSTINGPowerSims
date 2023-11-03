@@ -11,7 +11,6 @@
 #' @param inclPhenology should the model account for seasonal variation?
 #' @param inclPanTrap should the model include pan trap data?
 #' @param maxSp defines the maximum number of species to model. Species with numbers greater than this are ignored
-#'
 #' @return if `outpath` is NULL then a list comprising model output and metadata. Otherwise nothing
 #' @export
 

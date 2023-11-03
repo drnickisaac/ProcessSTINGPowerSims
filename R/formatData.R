@@ -18,7 +18,7 @@ formatData <- function(indata){
                         nvisit = nrow(castDat),
                         site = as.numeric(gsub(castDat$siteID, patt="site_", repl="")),
                         year = castDat$year,
-                        round = castDat$round,
+                        #round = castDat$round,
                         JulDate = castDat$jday,
                         nT = castDat$total_pantraps)
 

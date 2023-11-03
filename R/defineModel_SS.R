@@ -21,7 +21,7 @@ defineModel_SS <- function(inclPhenology = TRUE,
     ######################### state model priors
     for(j in 1:nsite) {eta[j] ~ dnorm(0, tau.eta)} # site-level random effect
     tau.eta ~ T(dt(0, 1, 1), 0, Inf) # Half Cauchy
-    Trend ~ dnorm(0, sd=0.0001)
+    Trend ~ dnorm(0, tau=0.0001)
 
     ######################### Obs model
     for(k in 1:nvisit) {
@@ -62,9 +62,8 @@ defineModel_SS <- function(inclPhenology = TRUE,
       }
 
     #########################  derived parameters
-    psi.fs <- mean(z[1:nsite])
-    mu.lambda <- mean(lambda[1:nsite])
-
+    #psi.fs <- mean(z[1:nsite])
+    #mu.lambda <- mean(lambda[1:nsite])
   })
   return(modelcode)
 }

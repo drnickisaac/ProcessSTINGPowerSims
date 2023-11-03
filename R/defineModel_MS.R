@@ -11,7 +11,7 @@ defineModel_MS <- function(inclPhenology = TRUE,
   modelcode <- nimbleCode({
     ######################### state model
     for(i in 1:nsp){
-      for(j in 1:nsite) {
+      for(j in 1:nsite){
         for(t in 1:nyear){
           linPred[i,j,t] <- alpha.s[i] + Trend * t  + spTr[i] * t + eta[j]
           log(lambda[i,j,t]) <- linPred[i,j,t]
@@ -31,7 +31,7 @@ defineModel_MS <- function(inclPhenology = TRUE,
 
     ######################### Obs model
     for(i in 1:nsp){
-      for(k in 1:nvisit) {
+      for(k in 1:nvisit){
           ##### pan traps
           if(inclPanTrap){
             y1[i,k] ~ dbin(size = nT[k], prob = Py[i,k]) # Observed data
@@ -70,10 +70,11 @@ defineModel_MS <- function(inclPhenology = TRUE,
       }
     }
     #########################  derived parameters
-    for(i in 1:nsp){
-      psi.fs[i] <- mean(z[i,1:nsite])
-      mu.lambda[i] <- mean(lambda[i,1:nsite])
-    }
+    #for(i in 1:nsp){
+    #  for(t in 1:nyr){
+    #  psi.fs[i,t] <- mean(z[i,1:nsite,t])
+    #  mu.lambda[i,t] <- mean(lambda[i,1:nsite, t])
+    #}}
   })
   return(modelcode)
 }

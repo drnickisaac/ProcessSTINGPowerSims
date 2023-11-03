@@ -15,7 +15,7 @@
 
 runModel <- function(dataConstants,
                      obsData,
-                     dataSumm, # only works for multispecies option
+                     dataSumm,
                      useNimble = TRUE,
                      n.iter = 1000,
                      inclPhenology = TRUE,
@@ -91,7 +91,7 @@ runModel <- function(dataConstants,
 
       # step 3 build an MCMC object using buildMCMC(). we can add some customization here
       occMCMC <- buildMCMC(model,
-                           monitors = c("mu.lambda", "psi.fs",
+                           monitors = c(#"mu.lambda", "psi.fs",
                                         #'alpha.s', "beta.s",
                                         #'alpha.p', "phScale","Multiplier",
                                         #"beta1", "beta2"
