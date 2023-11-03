@@ -35,7 +35,7 @@ defineModel_SS <- function(inclPhenology = TRUE,
           ##### transects
           y2[k] ~ dpois(lambdaThin[k]) # Observed counts. Might need a NegBin here or Zero-inflated
           y3[k] ~ dpois(lambdaThin[k]) # Observed counts. Might need a NegBin here or Zero-inflated
-          lambdaThin[k] <- Multiplier * lambda[ site[k]] * pThin[k]
+          lambdaThin[k] <- Multiplier * lambda[site[k], year[k]] * pThin[k]
 
           #### shared: phenology
           if(inclPhenology){

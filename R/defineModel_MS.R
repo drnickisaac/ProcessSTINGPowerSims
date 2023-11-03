@@ -21,13 +21,13 @@ defineModel_MS <- function(inclPhenology = TRUE,
 
     ######################### state model priors
     for(i in 1:nsp) {
-      alpha.s[i] ~ dnorm(0, sd=0.0001)
-      spTr[i] ~ dnorm(0, sd=simga.trend)
+      alpha.s[i] ~ dnorm(0, tau=0.0001)
+      spTr[i] ~ dnorm(0, tau=tau.trend)
     }
-    for(j in 1:nsite) {eta[j] ~ dnorm(0, tau.eta)} # site-level random effect
+    for(j in 1:nsite) {eta[j] ~ dnorm(0, tau=tau.eta)} # site-level random effect
     tau.eta ~ T(dt(0, 1, 1), 0, Inf) # Half Cauchy
-    sigma.trend ~ T(dt(0, 1, 1), 0, Inf) # Half Cauchy
-    Trend ~ dnorm(0, sd=0.0001)
+    tau.trend ~ T(dt(0, 1, 1), 0, Inf) # Half Cauchy
+    Trend ~ dnorm(0, tau=0.0001)
 
     ######################### Obs model
     for(i in 1:nsp){
@@ -35,14 +35,14 @@ defineModel_MS <- function(inclPhenology = TRUE,
           ##### pan traps
           if(inclPanTrap){
             y1[i,k] ~ dbin(size = nT[k], prob = Py[i,k]) # Observed data
-            Py[i,k] <- z[i,site[k], year[k]] * p1[i,k]
+            Py[i,k] <- z[i, site[k], year[k]] * p1[i,k]
             p1[i,k] <- alpha.p[i] * pThin[i,k]
           } # Should I add site + year effects to detectability?
 
           ##### transects
           y2[i,k] ~ dpois(lambdaThin[i,k]) # Observed counts. Might need a NegBin here or Zero-inflated
           y3[i,k] ~ dpois(lambdaThin[i,k]) # Observed counts. Might need a NegBin here or Zero-inflated
-          lambdaThin[i,k] <- Multiplier * lambda[i, site[k]] * pThin[i,k]
+          lambdaThin[i,k] <- Multiplier * lambda[i, site[k], year[k]] * pThin[i,k]
 
           #### shared: phenology
           if(inclPhenology){

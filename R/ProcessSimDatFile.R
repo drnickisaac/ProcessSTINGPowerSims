@@ -36,6 +36,13 @@ ProcessSimDatFile <- function(filename, inPath = ".",
   # SUMMARISE the data
   dataSumm <- with(formattedData, summariseData(obsData, dataConstants))
 
+  if(maxSp == 1){
+    # for the single species option:
+    #1) need to reduce `dataSumm` and `formattedData$obsData` to single species
+    #2) loop runModel to run over each species in term
+    #3) collate the trends for each species into a multispecies average
+  }
+
   # run the model
   modelEff <- runModel(formattedData$dataConstants, formattedData$obsData,
                        dataSumm = dataSumm,
