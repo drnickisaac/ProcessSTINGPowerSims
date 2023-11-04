@@ -48,6 +48,8 @@ runModel <- function(dataConstants,
                                       beta2 = rep(50, dataConstants$nsp),
                                       phScale = rep(1, dataConstants$nsp),
                                       Multiplier = 1,
+                                      tau.eta = abs(rt(1, 1)),
+                                      tau.trend = abs(rt(1, 1)),
                                       Trend = rnorm(n=1))
     )
 
@@ -119,6 +121,8 @@ runModel <- function(dataConstants,
                                      beta2 = rep(50, dataConstants$nsp),
                                      phScale = rep(1, dataConstants$nsp),
                                      Multiplier = 1,
+                                     tau.eta = abs(rt(1, 1)),
+                                     tau.trend = abs(rt(1, 1)),
                                      Trend = rnorm(n=1)),
                                    nburnin = n.iter/2, niter = n.iter, nchains = 3, samplesAsCodaMCMC = T)
 
@@ -138,3 +142,4 @@ runModel <- function(dataConstants,
     return(yearEff)
   }
 }
+
