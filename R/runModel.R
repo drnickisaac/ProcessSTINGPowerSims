@@ -47,7 +47,8 @@ runModel <- function(dataConstants,
                                       beta1 = rep(180, dataConstants$nsp),
                                       beta2 = rep(50, dataConstants$nsp),
                                       phScale = rep(1, dataConstants$nsp),
-                                      Multiplier = 1)
+                                      Multiplier = 1,
+                                      Trend = rnorm(n=1))
     )
 
     # step 3 build an MCMC object using buildMCMC(). we can add some customization here
@@ -117,7 +118,8 @@ runModel <- function(dataConstants,
                                      beta1 = rep(180, dataConstants$nsp),
                                      beta2 = rep(50, dataConstants$nsp),
                                      phScale = rep(1, dataConstants$nsp),
-                                     Multiplier = 1),
+                                     Multiplier = 1,
+                                     Trend = rnorm(n=1)),
                                    nburnin = n.iter/2, niter = n.iter, nchains = 3, samplesAsCodaMCMC = T)
 
       })
