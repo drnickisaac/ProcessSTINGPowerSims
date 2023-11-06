@@ -12,7 +12,8 @@ ProcessSimDatFile(
   n.iter = 1000,
   inclPhenology = TRUE,
   inclPanTrap = TRUE,
-  maxSp = 9999
+  maxSp = 9999,
+  parallelize = FALSE
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ ProcessSimDatFile(
 \item{inclPanTrap}{should the model include pan trap data?}
 
 \item{maxSp}{defines the maximum number of species to model. Species with numbers greater than this are ignored}
+
+\item{parallelize}{option to parallelize across MCMC chains}
 }
 \value{
 if \code{outpath} is NULL then a list comprising model output and metadata. Otherwise nothing

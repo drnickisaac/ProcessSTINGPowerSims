@@ -9,8 +9,11 @@
 #' @param inclPhenology should the model account for seasonal variation?
 #' @param inclPanTrap should the model include pan trap data?
 #' @param maxSp maximum number of species. If set at 1, the model is run sequentially for every species in the dataset
+#' @param parallelize should the chains be run as separate processes on different cores?
 #' @return a set of year effects
 #' @import nimble
+#' @import pbmcapply
+#' @import parallel
 #' @export
 
 runModel <- function(dataConstants,
@@ -20,7 +23,8 @@ runModel <- function(dataConstants,
                      n.iter = 1000,
                      inclPhenology = TRUE,
                      inclPanTrap = TRUE,
-                     maxSp = 9999){
+                     maxSp = 9999,
+                     parallelize = FALSE){
 
   if(useNimble) {
       # truncate the dataset if there are too many species
@@ -28,6 +32,8 @@ runModel <- function(dataConstants,
         obsData <- lapply(obsData, function(x) x[1:maxSp,])
         dataConstants$nsp <- maxSp
         dataSumm$occMatrix <- dataSumm$occMatrix[1:maxSp,,]
+        dataSumm$naiveOcc <- dataSumm$naiveOcc[1:maxSp]
+        dataSumm$reportingRate <- dataSumm$reportingRate[1:maxSp]
   }
 
   ###################################################################
@@ -71,7 +77,22 @@ runModel <- function(dataConstants,
   # instantaneous
 
   # and now we can use either $run or runMCMC() on the compiled model object.
-  runMCMC_samples <- runMCMC(CoccMCMC, nburnin = n.iter/2, niter = n.iter, nchains = 3, samplesAsCodaMCMC = T)
+  if(parallelize){
+    av_cores <- parallel::detectCores() - 1
+    runMCMC_samples <- pbmcapply::pbmclapply(1:3, function(i)
+                              runMCMC(
+                                mcmc=CoccMCMC,
+                                nburnin = n.iter/2,
+                                niter = n.iter,
+                                nchains = 1, samplesAsCodaMCMC = T)
+                              , mc.cores = av_cores)
+
+  } else {
+    runMCMC_samples <- runMCMC(CoccMCMC,
+                             nburnin = n.iter/2,
+                             niter = n.iter,
+                             nchains = 3, samplesAsCodaMCMC = T)
+  }
 
   ############################################ end multispecies
 

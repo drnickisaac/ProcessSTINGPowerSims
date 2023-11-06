@@ -12,6 +12,7 @@
 #' @param inclPanTrap should the model include pan trap data?
 #' @param maxSp defines the maximum number of species to model. Species with numbers greater than this are ignored
 #' @param maxFiles defines the maximum number of files to work with. Additional files are ignored
+#' @param parallelize option to parallelize across MCMC chains
 #' @return Nothing
 #' from reshape2 @import dcast
 #' @export
@@ -25,7 +26,8 @@ ProcessSimFiles <- function(inPath = ".",
                             inclPhenology = TRUE,
                             inclPanTrap = TRUE,
                             maxSp = 9999,
-                            maxFiles = 9999){
+                            maxFiles = 9999,
+                            parallelize = FALSE){
 
   simfiles <- list.files(inPath)
   if(length(simfiles) > maxFiles) simfiles <- simfiles[1:maxFiles]
@@ -37,7 +39,8 @@ ProcessSimFiles <- function(inPath = ".",
     # we're going to take all the outputs together and format them into something pretty
     output <- lapply(simfiles, ProcessSimDatFile,
                      inPath = inPath, outPath = NULL,
-                     useNimble = useNimble, maxSp = maxSp)
+                     useNimble = useNimble, maxSp = maxSp,
+                     parallelize = parallelize)
 
     # extract the metadata
     names <- sapply(output, function(x) x$name)
@@ -51,6 +54,7 @@ ProcessSimFiles <- function(inPath = ".",
   } else {
     sapply(simfiles, ProcessSimDatFile,
            inPath = inPath, outPath = outPath,
-           maxSp = maxSp)
+           maxSp = maxSp,
+           parallelize = parallelize)
   }
 }

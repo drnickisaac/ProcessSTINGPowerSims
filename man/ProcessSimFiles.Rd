@@ -13,7 +13,8 @@ ProcessSimFiles(
   inclPhenology = TRUE,
   inclPanTrap = TRUE,
   maxSp = 9999,
-  maxFiles = 9999
+  maxFiles = 9999,
+  parallelize = FALSE
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ ProcessSimFiles(
 \item{maxSp}{defines the maximum number of species to model. Species with numbers greater than this are ignored}
 
 \item{maxFiles}{defines the maximum number of files to work with. Additional files are ignored}
+
+\item{parallelize}{option to parallelize across MCMC chains}
 }
 \value{
 Nothing

@@ -12,7 +12,8 @@ runModel(
   n.iter = 1000,
   inclPhenology = TRUE,
   inclPanTrap = TRUE,
-  maxSp = 9999
+  maxSp = 9999,
+  parallelize = FALSE
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ runModel(
 \item{inclPanTrap}{should the model include pan trap data?}
 
 \item{maxSp}{maximum number of species. If set at 1, the model is run sequentially for every species in the dataset}
+
+\item{parallelize}{should the chains be run as separate processes on different cores?}
 }
 \value{
 a set of year effects
