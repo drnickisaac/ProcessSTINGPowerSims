@@ -66,6 +66,8 @@ ProcessSimDatFile <- function(filename,
                 timestamp  = format(Sys.time(), "%y%m%d%H%M%S"))
 
   if(!is.null(outPath)){
+    if(!dir.exists(outPath))
+      dir.create(outPath)
     saveRDS(file = file.path(outPath, filename), object = output)
   } else {
     return(output)
