@@ -59,7 +59,8 @@ ProcessSimDatFile <- function(filename,
   }
 
   # finish up an complete the job
-  output <- list(name = gsub(filename, patt = "\\.rds", repl = ""),
+  name <- gsub(filename, patt = "\\.rds", repl = "")
+  output <- list(name = name,
                 md = formattedData$md,
                 dataSumm = dataSumm,
                 modelEff = modelEff,
@@ -68,7 +69,7 @@ ProcessSimDatFile <- function(filename,
   if(!is.null(outPath)){
     if(!dir.exists(outPath))
       dir.create(outPath)
-    saveRDS(file = file.path(outPath, paste0(filename, "_Result")), object = output)
+    saveRDS(file = file.path(outPath, paste0(name, "_Result.rds")), object = output)
   } else {
     return(output)
   }

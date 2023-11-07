@@ -178,7 +178,7 @@ if(useNimble) {
           }
         )
       }
-      # might need to modify the shape of yearEff here
+      names(yearEff) <- dimnames(occMatrix)[[1]][1:maxSp]
     }
 
   #####################################################################
