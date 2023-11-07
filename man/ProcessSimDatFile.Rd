@@ -8,7 +8,7 @@ ProcessSimDatFile(
   filename,
   inPath = ".",
   outPath = NULL,
-  useNimble = FALSE,
+  useNimble = TRUE,
   n.iter = 1000,
   inclPhenology = TRUE,
   inclPanTrap = TRUE,

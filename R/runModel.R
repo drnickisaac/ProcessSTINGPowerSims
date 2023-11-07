@@ -60,7 +60,8 @@ if(useNimble) {
                                       beta2 = rep(50, dataConstants$nsp),
                                       phScale = rep(1, dataConstants$nsp),
                                       Multiplier = 1,
-                                      tau.eta = abs(rt(1, 1)),
+                                      tau.eta = 0.2,
+                                      eta = rnorm(n=dataConstants$nsite, mean=0, sd=2),
                                       tau.trend = abs(rt(1, 1)),
                                       Trend = rnorm(n=1))
     )
@@ -72,11 +73,10 @@ if(useNimble) {
                        useConjugacy = FALSE) # useConjugacy controls whether conjugate samplers are assigned when possible
 
     # step 3 before compiling the MCMC object we need to compile the model first
-    Cmodel <- compileNimble(model) # NJBI: I don't understand why this step is necessary
+    Cmodel <- compileNimble(model)
 
     # now the MCMC (project = NIMBLE model already associated with a project)
     CoccMCMC <- compileNimble(occMCMC, project = model)
-    # instantaneous
 
     # and now we can use either $run or runMCMC() on the compiled model object.
     if(parallelize){
@@ -109,40 +109,49 @@ if(useNimble) {
                                         beta2 = 50,
                                         phScale = 1,
                                         Multiplier = 1,
-                                        tau.eta = abs(rt(1, 1)),
-                                        tau.trend = abs(rt(1, 1)),
+                                        tau.eta = 0.2,
+                                        eta = rnorm(n=dataConstants$nsite, mean=0, sd=2),
                                         Trend = rnorm(n=1)),
                            constants = dataConstants[!names(dataConstants) %in% "nsp"])
 
       # step 3 build an MCMC object using buildMCMC(). we can add some customization here
       occMCMC <- buildMCMC(model,
-                           monitors = c("Trend"),
+                           monitors = c("mu.lambda",
+                                        "Trend"),
                            useConjugacy = FALSE) # useConjugacy controls whether conjugate samplers are assigned when possible
 
       # step 3 before compiling the MCMC object we need to compile the model first
-      Cmodel <- compileNimble(model) # NJBI: I don't understand why this step is necessary
+      Cmodel <- compileNimble(model)
 
       # now the MCMC (project = NIMBLE model already associated with a project)
       CoccMCMC <- compileNimble(occMCMC, project = model)
-      # instantaneous
 
   #######
 
       single_species_model <- function(sp, spDat, dataSumm, n.iter, Cmodel, CoccMCMC){
+
         # add the data
         Cmodel$setData(spDat)
-        #Cmodel$y1 <- spDat$y1
 
+        # finish initialization
         Cmodel$setInits(list(z = dataSumm$occMatrix[sp],
                         alpha.s = cloglog(dataSumm$naiveOcc)[sp],
                         alpha.p = dataSumm$reportingRate[sp] # replace with reportingRate_1 when I can calculate it
                         ))
 
         # and now we can use either $run on the compiled model object.
-        runMCMC_samples <- CoccMCMC$run(nburnin = n.iter/2,
-                                        niter = n.iter,
-                                        chain = 3,
-                                        thin = 5)
+        samplesList <- list()
+        for(i in 1:3){
+          CoccMCMC$run(niter = n.iter,
+                       nburnin = n.iter/2,
+                       chain = i,
+                       thin = 5,
+                       reset = TRUE,
+                       time = TRUE)
+          tmp <- as.matrix(CoccMCMC$mvSamples)
+          samplesList[[i]] <- tmp
+        }
+        samplesList <- as.mcmc.list(lapply(samplesList, as.mcmc))
       }
 
   ####### run the model for each species

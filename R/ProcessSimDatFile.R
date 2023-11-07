@@ -17,9 +17,10 @@
 #' @export
 
 
-ProcessSimDatFile <- function(filename, inPath = ".",
+ProcessSimDatFile <- function(filename,
+                              inPath = ".",
                               outPath = NULL,
-                              useNimble = FALSE,
+                              useNimble = TRUE,
                               n.iter = 1000,
                               inclPhenology = TRUE,
                               inclPanTrap = TRUE,
@@ -27,36 +28,39 @@ ProcessSimDatFile <- function(filename, inPath = ".",
                               multiSp = FALSE,
                               parallelize = FALSE){
 
-  indata <- readRDS(file.path(inPath, filename))
-
-  # get the metadata
-  md <- formatMetadata(indata)
-  if(maxSp < 9999) md$maxSp <- maxSp
+  #Read in the data
+  fileNamePath <- file.path(inPath, filename)
+  if(file.exists(fileNamePath))
+     indata <- readRDS(fileNamePath)
+  else
+    stop(paste0(fileNamePath, "not found"))
 
   # format the data
   formattedData <- formatData(indata)
 
+  # if appropriate, limit the number of species
+  formattedData$md$maxSp <- min(maxSp, formattedData$md$sp_obs)
+
   # SUMMARISE the data
   dataSumm <- with(formattedData, summariseData(obsData, dataConstants))
 
-  if(maxSp == 1){
-    # for the single species option:
-    #1) need to reduce `dataSumm` and `formattedData$obsData` to single species
-    #2) loop runModel to run over each species in term
-    #3) collate the trends for each species into a multispecies average
-  }
-
   # run the model
-  modelEff <- runModel(formattedData$dataConstants, formattedData$obsData,
+  modelEff <- runModel(formattedData$dataConstants,
+                       formattedData$obsData,
                        dataSumm = dataSumm,
                        useNimble = useNimble,
-                       maxSp = maxSp,
+                       maxSp = formattedData$md$maxSp,
                        multiSp = multiSp,
                        parallelize = parallelize)
 
+  if(!multiSp){
+  # for the single species option ...
+  # collate the trends for each species into a multispecies average
+  }
+
   # finish up an complete the job
   output <- list(name = gsub(filename, patt = "\\.rds", repl = ""),
-                md=md,
+                md = formattedData$md,
                 dataSumm = dataSumm,
                 modelEff = modelEff,
                 timestamp  = format(Sys.time(), "%y%m%d%H%M%S"))

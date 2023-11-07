@@ -37,5 +37,6 @@ formatData <- function(inData){
                   y3 = t(trCount2))
 
   return(list(dataConstants = dataConstants,
-              obsData = obsData))
+              obsData = obsData,
+              md = md))
 }

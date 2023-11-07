@@ -8,7 +8,7 @@ ProcessSimFiles(
   inPath = ".",
   outPath = "output",
   collateOutput = TRUE,
-  useNimble = FALSE,
+  useNimble = TRUE,
   n.iter = 1000,
   inclPhenology = TRUE,
   inclPanTrap = TRUE,

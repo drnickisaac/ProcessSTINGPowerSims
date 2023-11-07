@@ -62,8 +62,10 @@ defineModel_SS <- function(inclPhenology = TRUE,
       }
 
     #########################  derived parameters
-    #psi.fs <- mean(z[1:nsite])
-    #mu.lambda <- mean(lambda[1:nsite])
+    for(t in 1:nyear){
+      #psi.fs[t] <- mean(z[1:nsite],t)
+      mu.lambda[t] <- mean(lambda[1:nsite,t])
+    }
   })
   return(modelcode)
 }
