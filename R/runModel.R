@@ -11,10 +11,10 @@
 #' @param maxSp maximum number of species. If set at 1, the model is run sequentially for every species in the dataset
 #' @param parallelize should the chains be run as separate processes on different cores?
 #' @return a set of year effects
+#' @export
 #' @import nimble
 #' @import pbmcapply
 #' @import parallel
-#' @export
 
 runModel <- function(dataConstants,
                      obsData,
@@ -61,11 +61,7 @@ runModel <- function(dataConstants,
 
     # step 3 build an MCMC object using buildMCMC(). we can add some customization here
     occMCMC <- buildMCMC(model,
-                       monitors = c(#"mu.lambda", "psi.fs",
-                                    #'alpha.s', "beta.s",
-                                    #'alpha.p', "phScale","Multiplier",
-                                    #"beta1", "beta2"
-                                    "Trend"),
+                       monitors = c("Trend"),
                        thin = 3,
                        useConjugacy = FALSE) # useConjugacy controls whether conjugate samplers are assigned when possible
 
@@ -81,11 +77,11 @@ runModel <- function(dataConstants,
     av_cores <- parallel::detectCores() - 1
     runMCMC_samples <- pbmcapply::pbmclapply(1:3, function(i)
                               runMCMC(
-                                mcmc=CoccMCMC,
+                                mcmc = CoccMCMC,
                                 nburnin = n.iter/2,
                                 niter = n.iter,
-                                nchains = 1, samplesAsCodaMCMC = T)
-                              , mc.cores = av_cores)
+                                nchains = 1, samplesAsCodaMCMC = T),
+                              mc.cores = av_cores)
 
   } else {
     runMCMC_samples <- runMCMC(CoccMCMC,
@@ -115,11 +111,7 @@ runModel <- function(dataConstants,
 
       # step 3 build an MCMC object using buildMCMC(). we can add some customization here
       occMCMC <- buildMCMC(model,
-                           monitors = c(#"mu.lambda", "psi.fs",
-                                        #'alpha.s', "beta.s",
-                                        #'alpha.p', "phScale","Multiplier",
-                                        #"beta1", "beta2"
-                                        "Trend"),
+                           monitors = c("Trend"),
                            thin = 3,
                            useConjugacy = FALSE) # useConjugacy controls whether conjugate samplers are assigned when possible
 
