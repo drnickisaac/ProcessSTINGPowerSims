@@ -11,6 +11,7 @@
 #' @param inclPhenology should the model account for seasonal variation?
 #' @param inclPanTrap should the model include pan trap data?
 #' @param maxSp defines the maximum number of species to model. Species with numbers greater than this are ignored
+#' @param multiSp should the model be run for each species separately, or in a single model?
 #' @param parallelize option to parallelize across MCMC chains
 #' @return if `outpath` is NULL then a list comprising model output and metadata. Otherwise nothing
 #' @export
@@ -23,6 +24,7 @@ ProcessSimDatFile <- function(filename, inPath = ".",
                               inclPhenology = TRUE,
                               inclPanTrap = TRUE,
                               maxSp = 9999,
+                              multiSp = FALSE,
                               parallelize = FALSE){
 
   indata <- readRDS(file.path(inPath, filename))
@@ -47,7 +49,9 @@ ProcessSimDatFile <- function(filename, inPath = ".",
   # run the model
   modelEff <- runModel(formattedData$dataConstants, formattedData$obsData,
                        dataSumm = dataSumm,
-                       useNimble = useNimble, maxSp = maxSp,
+                       useNimble = useNimble,
+                       maxSp = maxSp,
+                       multiSp = multiSp,
                        parallelize = parallelize)
 
   # finish up an complete the job

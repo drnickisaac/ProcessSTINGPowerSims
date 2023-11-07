@@ -13,6 +13,7 @@ runModel(
   inclPhenology = TRUE,
   inclPanTrap = TRUE,
   maxSp = 9999,
+  multiSp = TRUE,
   parallelize = FALSE
 )
 }
@@ -31,7 +32,9 @@ runModel(
 
 \item{inclPanTrap}{should the model include pan trap data?}
 
-\item{maxSp}{maximum number of species. If set at 1, the model is run sequentially for every species in the dataset}
+\item{maxSp}{maximum number of species to be modelled}
+
+\item{multiSp}{should the model be run as a multispecies model, or many single-species models?}
 
 \item{parallelize}{should the chains be run as separate processes on different cores?}
 }

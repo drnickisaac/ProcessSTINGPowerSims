@@ -12,6 +12,7 @@ ProcessSimFiles(
   n.iter = 1000,
   inclPhenology = TRUE,
   inclPanTrap = TRUE,
+  multiSp = FALSE,
   maxSp = 9999,
   maxFiles = 9999,
   parallelize = FALSE
@@ -31,6 +32,8 @@ ProcessSimFiles(
 \item{inclPhenology}{should the model account for seasonal variation?}
 
 \item{inclPanTrap}{should the model include pan trap data?}
+
+\item{multiSp}{should the model be run for species separately, or in a multispecies model?}
 
 \item{maxSp}{defines the maximum number of species to model. Species with numbers greater than this are ignored}
 

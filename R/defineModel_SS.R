@@ -10,13 +10,13 @@ defineModel_SS <- function(inclPhenology = TRUE,
 
   modelcode <- nimbleCode({
     ######################### state model
-    for(j in 1:nsite) {
-        for(t in 1:nyear)
+    for(j in 1:nsite){
+        for(t in 1:nyear){
           linPred[j,t] <- alpha.s + Trend * t + eta[j]
           log(lambda[j,t]) <- linPred[j,t]
           cloglog(psi[j,t]) <- linPred[j,t]
           z[j,t] ~ dbern(psi[j,t]) # True occupancy status
-    }
+    }}
 
     ######################### state model priors
     for(j in 1:nsite) {eta[j] ~ dnorm(0, tau.eta)} # site-level random effect
@@ -56,7 +56,7 @@ defineModel_SS <- function(inclPhenology = TRUE,
           phScale ~ T(dt(0, 1, 1), 0, Inf) # Half Cauchy
 
         for (d in 1:365){
-          f_JD[d] <- 1/((2*3.14159265359)^0.5 * beta2) * exp(-((d - (beta1[i]))^2 / (2* beta2[i]^2)))
+          f_JD[d] <- 1/((2*3.14159265359)^0.5 * beta2) * exp(-((d - (beta1))^2 / (2* beta2^2)))
           # could simplify this and evaluate only for dates in the dataset
         }
       }

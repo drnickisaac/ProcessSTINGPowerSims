@@ -10,6 +10,7 @@
 #' @param n.iter number of iterations for the Nimble model
 #' @param inclPhenology should the model account for seasonal variation?
 #' @param inclPanTrap should the model include pan trap data?
+#' @param multiSp should the model be run for species separately, or in a multispecies model?
 #' @param maxSp defines the maximum number of species to model. Species with numbers greater than this are ignored
 #' @param maxFiles defines the maximum number of files to work with. Additional files are ignored
 #' @param parallelize option to parallelize across MCMC chains
@@ -25,6 +26,7 @@ ProcessSimFiles <- function(inPath = ".",
                             n.iter = 1000,
                             inclPhenology = TRUE,
                             inclPanTrap = TRUE,
+                            multiSp = FALSE,
                             maxSp = 9999,
                             maxFiles = 9999,
                             parallelize = FALSE){
@@ -39,8 +41,10 @@ ProcessSimFiles <- function(inPath = ".",
     # we're going to take all the outputs together and format them into something pretty
     output <- lapply(simfiles, ProcessSimDatFile,
                      inPath = inPath, outPath = NULL,
-                     useNimble = useNimble, maxSp = maxSp,
-                     parallelize = parallelize)
+                     useNimble = useNimble,
+                     maxSp = maxSp,
+                     parallelize = parallelize,
+                     multiSp = multiSp)
 
     # extract the metadata
     names <- sapply(output, function(x) x$name)

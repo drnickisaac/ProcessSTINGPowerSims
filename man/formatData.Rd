@@ -4,10 +4,10 @@
 \alias{formatData}
 \title{formatData}
 \usage{
-formatData(indata)
+formatData(inData)
 }
 \arguments{
-\item{indata}{A dataset produced by the simulations}
+\item{inData}{A dataset produced by the simulations}
 }
 \value{
 list of two data frames

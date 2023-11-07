@@ -2,32 +2,33 @@
 #'
 #' @details Formats data ready for Nimble
 #'
-#' @param indata A dataset produced by the simulations
+#' @param inData A dataset produced by the simulations
 #' @return list of two data frames
 #' @import reshape2
 #' @export
 
-formatData <- function(indata){
+formatData <- function(inData){
 
-  castDat <- dcast(indata, year + round + siteID + jday + total_pantraps ~ "nsp",
+  castDat <- dcast(inData, year + round + siteID + jday + total_pantraps ~ "nsp",
                    value.var = "abundance", fun = length, fill = 0)
 
-  dataConstants <- list(nyear = md$years,
-                        nsp = md$sp_obs,
+  md <- formatMetadata(inData)
+
+  dataConstants <- list(nsp = md$sp_obs,
                         nsite = md$sites,
                         nvisit = nrow(castDat),
-                        site = as.numeric(gsub(castDat$siteID, patt="site_", repl="")),
+                        nyear = md$years,
                         year = castDat$year,
-                        #round = castDat$round,
+                        site = as.numeric(gsub(castDat$siteID, patt="site_", repl="")),
                         JulDate = castDat$jday,
                         nT = castDat$total_pantraps)
 
   # extract the observations
-  ObsPan <- acast(indata, year + round + siteID ~ species,
+  ObsPan <- acast(inData, year + round + siteID ~ species,
                   value.var = "presences_pan", fill = 0)
-  trCount1 <- acast(indata, year + round + siteID ~ species,
+  trCount1 <- acast(inData, year + round + siteID ~ species,
                     value.var = "obs", fill=0)
-  trCount2 <- acast(indata, year + round + siteID ~ species,
+  trCount2 <- acast(inData, year + round + siteID ~ species,
                     value.var = "obs2", fill=0)
 
   # observations have to be transposed because we have coded species as the first dimension

@@ -13,6 +13,7 @@ ProcessSimDatFile(
   inclPhenology = TRUE,
   inclPanTrap = TRUE,
   maxSp = 9999,
+  multiSp = FALSE,
   parallelize = FALSE
 )
 }
@@ -32,6 +33,8 @@ ProcessSimDatFile(
 \item{inclPanTrap}{should the model include pan trap data?}
 
 \item{maxSp}{defines the maximum number of species to model. Species with numbers greater than this are ignored}
+
+\item{multiSp}{should the model be run for each species separately, or in a single model?}
 
 \item{parallelize}{option to parallelize across MCMC chains}
 }
