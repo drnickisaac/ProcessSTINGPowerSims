@@ -140,7 +140,7 @@ if(useNimble) {
                         alpha.p = dataSumm$reportingRate[sp] # replace with reportingRate_1 when I can calculate it
                         ))
 
-        # and now we can use either $run on the compiled model object.
+        # and now we can use $run on the compiled model object.
         samplesList <- list()
         for(i in 1:3){
           CoccMCMC$run(niter = n.iter,
@@ -178,7 +178,7 @@ if(useNimble) {
           }
         )
       }
-      # might need to modify the shape of yearEff here
+      names(yearEff) <- dimnames(dataSumm$occMatrix)[[1]][1:maxSp]
     }
 
   #####################################################################
