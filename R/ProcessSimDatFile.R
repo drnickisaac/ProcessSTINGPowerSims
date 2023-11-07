@@ -68,7 +68,7 @@ ProcessSimDatFile <- function(filename,
   if(!is.null(outPath)){
     if(!dir.exists(outPath))
       dir.create(outPath)
-    saveRDS(file = file.path(outPath, filename), object = output)
+    saveRDS(file = file.path(outPath, paste0(filename, "_Result")), object = output)
   } else {
     return(output)
   }

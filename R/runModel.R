@@ -16,6 +16,7 @@
 #' @import nimble
 #' @import pbmcapply
 #' @import parallel
+#' @import coda
 
 runModel <- function(dataConstants,
                      obsData,
@@ -151,7 +152,7 @@ if(useNimble) {
           tmp <- as.matrix(CoccMCMC$mvSamples)
           samplesList[[i]] <- tmp
         }
-        samplesList <- as.mcmc.list(lapply(samplesList, as.mcmc))
+        samplesList <- coda::as.mcmc.list(lapply(samplesList, as.mcmc))
       }
 
   ####### run the model for each species
