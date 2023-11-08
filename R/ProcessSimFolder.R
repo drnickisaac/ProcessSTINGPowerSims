@@ -47,11 +47,7 @@ ProcessSimFolder <- function(inPath = ".",
     simfiles <- list.files(inPath)
 
   # in either case, restrict to the set that are rds files
-<<<<<<< HEAD
   simfiles <- simfiles[grepl("\\.rds", simfiles)]
-=======
-  simfiles <- simfiles[grepl("\\.rds", dir_files)]
->>>>>>> 49acb948cc937cf00ae0b416c79724ab13bcb2bb
 
   # create an output directory
   if(!dir.exists(outPath)) dir.create(outPath)
