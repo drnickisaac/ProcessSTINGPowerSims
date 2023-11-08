@@ -24,8 +24,8 @@ defineModel_MS <- function(inclPhenology = TRUE,
       alpha.s[i] ~ dnorm(0, tau=0.0001)
       spTr[i] ~ dnorm(0, tau=tau.trend)
     }
-    for(j in 1:nsite) {eta[j] ~ dnorm(0, tau=tau.eta)} # site-level random effect
-    tau.eta ~ T(dt(0, 1, 1), 0, Inf) # Half Cauchy
+    for(j in 1:nsite) {eta[j] ~ dnorm(0, sd=sd.eta)} # site-level random effect
+    sd.eta ~ T(dt(0, 1, 1), 0, 10) # constrained
     tau.trend ~ T(dt(0, 1, 1), 0, Inf) # Half Cauchy
     Trend ~ dnorm(0, tau=0.0001)
 
