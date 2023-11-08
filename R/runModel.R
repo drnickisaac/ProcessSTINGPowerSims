@@ -45,9 +45,9 @@ if(useNimble) {
   if(dim(obsData$y1)[1] > maxSp){
     obsData <- lapply(obsData, function(x) x[1:maxSp,])
     dataConstants$nsp <- maxSp
-    dataSumm$occMatrix <- dataSumm$occMatrix[1:maxSp,,]
-    dataSumm$naiveOcc <- dataSumm$naiveOcc[1:maxSp]
-    dataSumm$reportingRate <- dataSumm$reportingRate[1:maxSp]
+    dataSumm$stats$occMatrix <- dataSumm$stats$occMatrix[1:maxSp,,]
+    dataSumm$stats$naiveOcc <- dataSumm$stats$naiveOcc[1:maxSp]
+    dataSumm$stats$reportingRate <- dataSumm$stats$reportingRate[1:maxSp]
   }
 
   ###################################################################
@@ -61,9 +61,9 @@ if(useNimble) {
     model <- nimbleModel(code = modelcode,
                          constants = dataConstants,
                          data = obsData,
-                         inits = list(z = dataSumm$occMatrix,
-                                      alpha.s = cloglog(dataSumm$naiveOcc),
-                                      alpha.p = dataSumm$reportingRate, # replace with reportingRate_1 when I can calculate it
+                         inits = list(z = dataSumm$stats$occMatrix,
+                                      alpha.s = cloglog(dataSumm$stats$naiveOcc),
+                                      alpha.p = dataSumm$stats$reportingRate, # replace with reportingRate_1 when I can calculate it
                                       beta1 = rep(180, dataConstants$nsp),
                                       beta2 = rep(50, dataConstants$nsp),
                                       phScale = rep(1, dataConstants$nsp),
@@ -142,9 +142,9 @@ if(useNimble) {
         Cmodel$setData(spDat)
 
         # finish initialization
-        Cmodel$setInits(list(z = dataSumm$occMatrix[sp],
-                        alpha.s = cloglog(dataSumm$naiveOcc)[sp],
-                        alpha.p = dataSumm$reportingRate[sp] # replace with reportingRate_1 when I can calculate it
+        Cmodel$setInits(list(z = dataSumm$stats$occMatrix[sp],
+                        alpha.s = cloglog(dataSumm$stats$naiveOcc)[sp],
+                        alpha.p = dataSumm$stats$reportingRate[sp] # replace with reportingRate_1 when I can calculate it
                         ))
 
         # and now we can use $run on the compiled model object.
@@ -185,7 +185,7 @@ if(useNimble) {
           }
         )
       }
-      names(yearEff) <- dimnames(dataSumm$occMatrix)[[1]][1:maxSp]
+      names(yearEff) <- dimnames(dataSumm$stats$occMatrix)[[1]][1:maxSp]
     }
 
   #####################################################################

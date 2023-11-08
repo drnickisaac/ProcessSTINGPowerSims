@@ -39,14 +39,10 @@ ProcessSimDatFile <- function(filename,
 
   #Read in the data; check the file exists then open it
   if(grepl("\\.zip", inPath)){
-    print("trying to open zipfile")
     con <- unz(inPath, filename, open = "rb")
-    print("made the connection")
     fileNamePath <- gzcon(con)
-    print("completed gzcon. Now about to read the file itself")
     indata <- readRDS(fileNamePath)
   } else {
-    print("there is not a zipfile")
     fileNamePath <- file.path(inPath, filename)
     if(file.exists(fileNamePath))
       indata <- readRDS(fileNamePath)
@@ -66,7 +62,7 @@ ProcessSimDatFile <- function(filename,
   # run the model
   modelEff <- runModel(formattedData$dataConstants,
                        formattedData$obsData,
-                       dataSumm = dataSumm,
+                       dataSummStats = dataSumm$stats,
                        useNimble = useNimble,
                        multiSp = multiSp,
                        parallelize = parallelize,
@@ -75,11 +71,6 @@ ProcessSimDatFile <- function(filename,
                        n.thin = n.thin,
                        n.chain = n.chain,
                        maxSp = formattedData$md$maxSp)
-
-  if(!multiSp){
-  # for the single species option ...
-  # collate the trends for each species into a multispecies average
-  }
 
   #clean up the name of the file. Remove the folder names and file suffix
   name <- gsub(filename, patt = "\\.rds", repl = "")

@@ -52,7 +52,7 @@ ProcessSimFolder <- function(inPath = ".",
 
   # create an output directory
   if(!dir.exists(outPath)) dir.create(outPath)
-print("now calling ProcessSimDatFile")
+
   output <- lapply(simfiles[1:maxFiles],
                    ProcessSimDatFile,
                    inPath = inPath,

@@ -22,10 +22,13 @@ summariseData <- function(obsData, dataConstants){
 
   return(list(
     occMatrix = occMatrix,
-    naiveOcc = apply(occSpSite, 1, mean),
-    reportingRate = rowMeans(obsData$y1/5), # per pan trap
-    meanCount = rowMeans(obsData$y2), # not counting the second transect
-    reportingRate_1 = NULL#mean(with(obsData, y1/5)[occSites,]), # per pan trap. Need to coerce to same shape as above
-    #meanCount_1 = NULL#mean(obsData$y2[occSites,])
+    stats = data.frame(
+      species = dimnames(occMatrix)[[1]],
+      naiveOcc = apply(occSpSite, 1, mean),
+      reportingRate = rowMeans(obsData$y1/5), # per pan trap
+      meanCount = rowMeans(obsData$y2), # not counting the second transect
+      reportingRate_1 = NULL#mean(with(obsData, y1/5)[occSites,]), # per pan trap. Need to coerce to same shape as above
+      #meanCount_1 = NULL#mean(obsData$y2[occSites,])
+    )
   ))
 }
