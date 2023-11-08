@@ -37,7 +37,7 @@ ProcessSimDatFile <- function(filename,
 #####################################################################
 
   #Read in the data
-  if(grepl(".zip", inPath)){
+  if(grepl("\\.zip", inPath)){
     con <- unz(inPath, filename, open = "rb")
     fileNamePath <- gzcon(con)
   } else {

@@ -41,7 +41,7 @@ ProcessSimFolder <- function(inPath = ".",
 
   # first job: extract the names of the files
   # this will be different depending on whether inPath refers to a folder or zipped archive
-  if(grepl(".zip", inPath))
+  if(grepl("\\.zip", inPath))
     simfiles <- as.character(unzip(inPath, list = TRUE)$Name)
   else
     simfiles <- list.files(inPath)
