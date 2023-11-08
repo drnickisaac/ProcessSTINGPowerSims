@@ -3,7 +3,7 @@
 #' @details Runs the model.
 #' @param dataConstants dataframe produced by ProcessSimDatFile()
 #' @param obsData dataframe produced by ProcessSimDatFile()
-#' @param dataSumm dataframe produced by ProcessSimDatFile()
+#' @param dataSummStats dataframe produced by ProcessSimDatFile()
 #' @param useNimble option to bypass the model fitting in Nimble (just for testing the code)
 #' @param inclPhenology should the model account for seasonal variation?
 #' @param inclPanTrap should the model include pan trap data?
@@ -23,7 +23,7 @@
 
 runModel <- function(dataConstants,
                      obsData,
-                     dataSumm,
+                     dataSummStats,
                      useNimble = TRUE,
                      inclPhenology = TRUE,
                      inclPanTrap = TRUE,
@@ -45,9 +45,9 @@ if(useNimble) {
   if(dim(obsData$y1)[1] > maxSp){
     obsData <- lapply(obsData, function(x) x[1:maxSp,])
     dataConstants$nsp <- maxSp
-    dataSumm$stats$occMatrix <- dataSumm$stats$occMatrix[1:maxSp,,]
-    dataSumm$stats$naiveOcc <- dataSumm$stats$naiveOcc[1:maxSp]
-    dataSumm$stats$reportingRate <- dataSumm$stats$reportingRate[1:maxSp]
+    dataSummStats$occMatrix <- dataSummStats$occMatrix[1:maxSp,,]
+    dataSummStats$naiveOcc <- dataSummStats$naiveOcc[1:maxSp]
+    dataSummStats$reportingRate <- dataSummStats$reportingRate[1:maxSp]
   }
 
   ###################################################################
@@ -61,9 +61,9 @@ if(useNimble) {
     model <- nimbleModel(code = modelcode,
                          constants = dataConstants,
                          data = obsData,
-                         inits = list(z = dataSumm$stats$occMatrix,
-                                      alpha.s = cloglog(dataSumm$stats$naiveOcc),
-                                      alpha.p = dataSumm$stats$reportingRate, # replace with reportingRate_1 when I can calculate it
+                         inits = list(z = dataSummStats$occMatrix,
+                                      alpha.s = cloglog(dataSummStats$naiveOcc),
+                                      alpha.p = dataSummStats$reportingRate, # replace with reportingRate_1 when I can calculate it
                                       beta1 = rep(180, dataConstants$nsp),
                                       beta2 = rep(50, dataConstants$nsp),
                                       phScale = rep(1, dataConstants$nsp),
@@ -136,15 +136,15 @@ if(useNimble) {
 
   #######
 
-      single_species_model <- function(sp, spDat, dataSumm, n.iter, Cmodel, CoccMCMC){
+      single_species_model <- function(sp, spDat, dataSummStats, n.iter, Cmodel, CoccMCMC){
 
         # add the data
         Cmodel$setData(spDat)
 
         # finish initialization
-        Cmodel$setInits(list(z = dataSumm$stats$occMatrix[sp],
-                        alpha.s = cloglog(dataSumm$stats$naiveOcc)[sp],
-                        alpha.p = dataSumm$stats$reportingRate[sp] # replace with reportingRate_1 when I can calculate it
+        Cmodel$setInits(list(z = dataSummStats$occMatrix[sp],
+                        alpha.s = cloglog(dataSummStats$naiveOcc)[sp],
+                        alpha.p = dataSummStats$reportingRate[sp] # replace with reportingRate_1 when I can calculate it
                         ))
 
         # and now we can use $run on the compiled model object.
@@ -169,7 +169,7 @@ if(useNimble) {
         yearEff <- pbmcapply::pbmclapply(1:maxSp, function(i){
           single_species_model(sp=i,
                                spDat=lapply(obsData, function(x) x[i,]),
-                               dataSumm=dataSumm,
+                               dataSummStats=dataSummStats,
                                n.iter=n.iter,
                                Cmodel, CoccMCMC)
           },
@@ -179,13 +179,13 @@ if(useNimble) {
         yearEff <- lapply(1:maxSp, function(i){
           single_species_model(sp=i,
                                spDat=lapply(obsData, function(x) x[i,]),
-                               dataSumm=dataSumm,
+                               dataSummStats=dataSummStats,
                                n.iter=n.iter,
                                Cmodel, CoccMCMC)
           }
         )
       }
-      names(yearEff) <- dimnames(dataSumm$stats$occMatrix)[[1]][1:maxSp]
+      names(yearEff) <- dimnames(dataSummStats$occMatrix)[[1]][1:maxSp]
     }
 
   #####################################################################
