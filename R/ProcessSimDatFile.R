@@ -76,8 +76,13 @@ ProcessSimDatFile <- function(filename,
   # collate the trends for each species into a multispecies average
   }
 
-  # finish up an complete the job
+  #clean up the name of the file. Remove the folder names and file suffix
   name <- gsub(filename, patt = "\\.rds", repl = "")
+  name <- gsub(filename, patt = "scenario_", repl = "")
+  name <- strsplit(name, "/")[[1]]
+  name <- name[length(name)]
+
+  # finish up an complete the job
   output <- list(name = name,
                 md = formattedData$md,
                 dataSumm = dataSumm,
