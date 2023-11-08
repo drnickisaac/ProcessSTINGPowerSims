@@ -42,17 +42,20 @@ ProcessSimFolder <- function(inPath = ".",
   # first job: extract the names of the files
   # this will be different depending on whether inPath refers to a folder or zipped archive
   if(grepl("\\.zip", inPath)){
+    print("I recognise there is a zip archive")
     simfiles <- as.character(unzip(inPath, list = TRUE)$Name)
+    print("I have read the names of the files in the zip")
   } else {
     simfiles <- list.files(inPath)
   }
 
   # in either case, restrict to the set that are rds files
   simfiles <- simfiles[grepl("\\.rds", simfiles)]
+print(paste(length(simfiles), "names have been read"))
 
   # create an output directory
   if(!dir.exists(outPath)) dir.create(outPath)
-
+print("now calling ProcessSimDatFile")
   output <- lapply(simfiles[1:maxFiles],
                    ProcessSimDatFile,
                    zip = zip,
