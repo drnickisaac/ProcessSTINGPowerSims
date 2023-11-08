@@ -27,8 +27,8 @@ summariseData <- function(obsData, dataConstants){
       naiveOcc = apply(occSpSite, 1, mean),
       reportingRate = rowMeans(obsData$y1/5), # per pan trap
       meanCount = rowMeans(obsData$y2), # not counting the second transect
-      reportingRate_1 = NULL#mean(with(obsData, y1/5)[occSites,]), # per pan trap. Need to coerce to same shape as above
-      #meanCount_1 = NULL#mean(obsData$y2[occSites,])
+      reportingRate_1 = NA,#mean(with(obsData, y1/5)[occSites,]), # per pan trap. Need to coerce to same shape as above
+      meanCount_1 = NA#mean(obsData$y2[occSites,])
     )
   ))
 }
