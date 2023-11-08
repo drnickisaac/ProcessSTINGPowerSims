@@ -9,12 +9,15 @@ runModel(
   obsData,
   dataSumm,
   useNimble = TRUE,
-  n.iter = 1000,
   inclPhenology = TRUE,
   inclPanTrap = TRUE,
-  maxSp = 9999,
   multiSp = TRUE,
-  parallelize = FALSE
+  parallelize = FALSE,
+  n.iter = 1000,
+  n.burn = NULL,
+  n.thin = 5,
+  n.chain = 3,
+  maxSp = 9999
 )
 }
 \arguments{
@@ -26,17 +29,23 @@ runModel(
 
 \item{useNimble}{option to bypass the model fitting in Nimble (just for testing the code)}
 
-\item{n.iter}{number of iterations for the Nimble model}
-
 \item{inclPhenology}{should the model account for seasonal variation?}
 
 \item{inclPanTrap}{should the model include pan trap data?}
 
-\item{maxSp}{maximum number of species to be modelled}
-
 \item{multiSp}{should the model be run as a multispecies model, or many single-species models?}
 
 \item{parallelize}{should the chains be run as separate processes on different cores?}
+
+\item{n.iter}{number of iterations for the Nimble model. Default is 1000.}
+
+\item{n.burn}{number of iterations for the burn-in. If \code{NULL} (the default), then it will be set to \code{n.iter/2}.}
+
+\item{n.thin}{thinning for the MCMC chains. Defaults to 5}
+
+\item{n.chain}{number of MCMC chains. Defaults to 3}
+
+\item{maxSp}{maximum number of species to be modelled}
 }
 \value{
 a set of year effects

@@ -9,12 +9,15 @@ ProcessSimDatFile(
   inPath = ".",
   outPath = NULL,
   useNimble = TRUE,
-  n.iter = 1000,
   inclPhenology = TRUE,
   inclPanTrap = TRUE,
-  maxSp = 9999,
   multiSp = FALSE,
-  parallelize = FALSE
+  parallelize = FALSE,
+  n.iter = 1000,
+  n.burn = NULL,
+  n.thin = 5,
+  n.chain = 3,
+  maxSp = 9999
 )
 }
 \arguments{
@@ -26,17 +29,23 @@ ProcessSimDatFile(
 
 \item{useNimble}{option to bypass the model fitting in Nimble (just for testing the code)}
 
-\item{n.iter}{number of iterations for the Nimble model}
-
 \item{inclPhenology}{should the model account for seasonal variation?}
 
 \item{inclPanTrap}{should the model include pan trap data?}
 
-\item{maxSp}{defines the maximum number of species to model. Species with numbers greater than this are ignored}
-
 \item{multiSp}{should the model be run for each species separately, or in a single model?}
 
 \item{parallelize}{option to parallelize across MCMC chains}
+
+\item{n.iter}{number of iterations for the Nimble model. Default is 1000.}
+
+\item{n.burn}{number of iterations for the burn-in. If \code{NULL} (the default), then it will be set to \code{n.iter/2}.}
+
+\item{n.thin}{thinning for the MCMC chains. Defaults to 5}
+
+\item{n.chain}{number of MCMC chains. Defaults to 3}
+
+\item{maxSp}{defines the maximum number of species to model. Species with numbers greater than this are ignored}
 }
 \value{
 if \code{outpath} is NULL then a list comprising model output and metadata. Otherwise nothing
@@ -45,5 +54,5 @@ if \code{outpath} is NULL then a list comprising model output and metadata. Othe
 ProcessSimDatFile
 }
 \details{
-Processes one file produced by Nacho's simulations. Extracts metadata, formats the data for the model, then runs the model
+Processes one file produced by Nacho's simulations. Extracts metadata, formats the data for the model, then runs the model. The file must be in RDS format.
 }

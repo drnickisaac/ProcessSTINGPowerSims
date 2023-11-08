@@ -5,12 +5,15 @@
 #' @param obsData dataframe produced by ProcessSimDatFile()
 #' @param dataSumm dataframe produced by ProcessSimDatFile()
 #' @param useNimble option to bypass the model fitting in Nimble (just for testing the code)
-#' @param n.iter number of iterations for the Nimble model
 #' @param inclPhenology should the model account for seasonal variation?
 #' @param inclPanTrap should the model include pan trap data?
-#' @param maxSp maximum number of species to be modelled
 #' @param multiSp should the model be run as a multispecies model, or many single-species models?
 #' @param parallelize should the chains be run as separate processes on different cores?
+#' @param n.iter number of iterations for the Nimble model. Default is 1000.
+#' @param n.burn number of iterations for the burn-in. If `NULL` (the default), then it will be set to `n.iter/2`.
+#' @param n.thin thinning for the MCMC chains. Defaults to 5
+#' @param n.chain number of MCMC chains. Defaults to 3
+#' @param maxSp maximum number of species to be modelled
 #' @return a set of year effects
 #' @export
 #' @import nimble
@@ -22,16 +25,20 @@ runModel <- function(dataConstants,
                      obsData,
                      dataSumm,
                      useNimble = TRUE,
-                     n.iter = 1000,
                      inclPhenology = TRUE,
                      inclPanTrap = TRUE,
-                     maxSp = 9999,
                      multiSp = TRUE,
-                     parallelize = FALSE){
+                     parallelize = FALSE,
+                     n.iter = 1000,
+                     n.burn = NULL,
+                     n.thin = 5,
+                     n.chain = 3,
+                     maxSp = 9999){
 
   ###################################################################
 
 if(useNimble) {
+  if(is.null(n.burn)) n.burn = n.iter/2
 
   ###################################################################
   # truncate the dataset if there are too many species
@@ -70,7 +77,7 @@ if(useNimble) {
     # step 3 build an MCMC object using buildMCMC(). we can add some customization here
     occMCMC <- buildMCMC(model,
                        monitors = c("Trend"),
-                       thin = 5,
+                       thin = n.thin,
                        useConjugacy = FALSE) # useConjugacy controls whether conjugate samplers are assigned when possible
 
     # step 3 before compiling the MCMC object we need to compile the model first
@@ -82,19 +89,19 @@ if(useNimble) {
     # and now we can use either $run or runMCMC() on the compiled model object.
     if(parallelize){
       av_cores <- parallel::detectCores() - 1
-      runMCMC_samples <- pbmcapply::pbmclapply(1:3, function(i)
+      runMCMC_samples <- pbmcapply::pbmclapply(1:n.chain, function(i)
                                 runMCMC(
                                   mcmc = CoccMCMC,
-                                  nburnin = n.iter/2,
+                                  nburnin = n.burn,
                                   niter = n.iter,
                                   nchains = 1, samplesAsCodaMCMC = T),
                                 mc.cores = av_cores)
 
     } else {
       runMCMC_samples <- runMCMC(CoccMCMC,
-                               nburnin = n.iter/2,
+                               nburnin = n.burn,
                                niter = n.iter,
-                               nchains = 3, samplesAsCodaMCMC = T)
+                               nchains = n.chain, samplesAsCodaMCMC = T)
     }
     yearEff <- runMCMC_samples
 
@@ -142,11 +149,11 @@ if(useNimble) {
 
         # and now we can use $run on the compiled model object.
         samplesList <- list()
-        for(i in 1:3){
+        for(i in 1:n.chain){
           CoccMCMC$run(niter = n.iter,
-                       nburnin = n.iter/2,
+                       nburnin = n.burn,
                        chain = i,
-                       thin = 5,
+                       thin = n.thin,
                        reset = TRUE,
                        time = TRUE)
           tmp <- as.matrix(CoccMCMC$mvSamples)

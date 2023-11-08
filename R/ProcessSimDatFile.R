@@ -1,13 +1,16 @@
 #' ProcessSimDatFile
 #'
 #' @details
-#' Processes one file produced by Nacho's simulations. Extracts metadata, formats the data for the model, then runs the model
+#' Processes one file produced by Nacho's simulations. Extracts metadata, formats the data for the model, then runs the model. The file must be in RDS format.
 #'
 #' @param filename the name of the datafile
 #' @param inPath location where the `filename` can be found
 #' @param outPath location where the results should be written. If `NULL` then results are returned rather than written.
 #' @param useNimble option to bypass the model fitting in Nimble (just for testing the code)
-#' @param n.iter number of iterations for the Nimble model
+#' @param n.iter number of iterations for the Nimble model. Default is 1000.
+#' @param n.burn number of iterations for the burn-in. If `NULL` (the default), then it will be set to `n.iter/2`.
+#' @param n.thin thinning for the MCMC chains. Defaults to 5
+#' @param n.chain number of MCMC chains. Defaults to 3
 #' @param inclPhenology should the model account for seasonal variation?
 #' @param inclPanTrap should the model include pan trap data?
 #' @param maxSp defines the maximum number of species to model. Species with numbers greater than this are ignored
@@ -21,17 +24,29 @@ ProcessSimDatFile <- function(filename,
                               inPath = ".",
                               outPath = NULL,
                               useNimble = TRUE,
-                              n.iter = 1000,
                               inclPhenology = TRUE,
                               inclPanTrap = TRUE,
-                              maxSp = 9999,
                               multiSp = FALSE,
-                              parallelize = FALSE){
+                              parallelize = FALSE,
+                              n.iter = 1000,
+                              n.burn = NULL,
+                              n.thin = 5,
+                              n.chain = 3,
+                              maxSp = 9999){
+
+#####################################################################
 
   #Read in the data
-  fileNamePath <- file.path(inPath, filename)
+  if(grepl(".zip", inPath)){
+    con <- unz(inPath, filename, open = "rb")
+    fileNamePath <- gzcon(con)
+  } else {
+    fileNamePath <- file.path(inPath, filename)
+  }
+
+  # check the file exists then open it
   if(file.exists(fileNamePath))
-     indata <- readRDS(fileNamePath)
+    indata <- readRDS(fileNamePath)
   else
     stop(paste0(fileNamePath, "not found"))
 
@@ -49,9 +64,13 @@ ProcessSimDatFile <- function(filename,
                        formattedData$obsData,
                        dataSumm = dataSumm,
                        useNimble = useNimble,
-                       maxSp = formattedData$md$maxSp,
                        multiSp = multiSp,
-                       parallelize = parallelize)
+                       parallelize = parallelize,
+                       n.iter = n.iter,
+                       n.burn = n.burn,
+                       n.thin = n.thin,
+                       n.chain = n.chain,
+                       maxSp = formattedData$md$maxSp)
 
   if(!multiSp){
   # for the single species option ...
@@ -64,12 +83,21 @@ ProcessSimDatFile <- function(filename,
                 md = formattedData$md,
                 dataSumm = dataSumm,
                 modelEff = modelEff,
+                runSettings = c(inclPhenology = inclPhenology,
+                                   inclPanTrap = inclPanTrap,
+                                   multiSp = multiSp,
+                                   parallelize = parallelize,
+                                   n.iter = n.iter,
+                                   n.burn = n.burn,
+                                   n.thin = n.thin,
+                                   n.chain = n.chain),
                 timestamp  = format(Sys.time(), "%y%m%d%H%M%S"))
 
   if(!is.null(outPath)){
     if(!dir.exists(outPath))
       dir.create(outPath)
     saveRDS(file = file.path(outPath, paste0(name, "_Result.rds")), object = output)
+    return(NULL)
   } else {
     return(output)
   }
