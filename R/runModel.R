@@ -44,10 +44,9 @@ runModel <- function(dataConstants,
     # truncate the dataset if there are too many species
     if(dim(obsData$y1)[1] > maxSp){
       obsData <- lapply(obsData, function(x) x[1:maxSp,])
-      dataConstants$nsp <- maxSp
       dataSumm$occMatrix <- dataSumm$occMatrix[1:maxSp,,]
-      dataSumm$stats$naiveOcc <- dataSumm$stats$naiveOcc[1:maxSp]
-      dataSumm$stats$reportingRate <- dataSumm$stats$reportingRate[1:maxSp]
+      dataSumm$stats <- dataSumm$stats[1:maxSp,]
+      dataConstants$nsp <- maxSp
     }
 
     ###################################################################
