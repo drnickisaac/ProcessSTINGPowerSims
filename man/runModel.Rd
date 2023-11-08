@@ -25,8 +25,6 @@ runModel(
 
 \item{obsData}{dataframe produced by ProcessSimDatFile()}
 
-\item{dataSumm}{dataframe produced by ProcessSimDatFile()}
-
 \item{useNimble}{option to bypass the model fitting in Nimble (just for testing the code)}
 
 \item{inclPhenology}{should the model account for seasonal variation?}
@@ -46,6 +44,8 @@ runModel(
 \item{n.chain}{number of MCMC chains. Defaults to 3}
 
 \item{maxSp}{maximum number of species to be modelled}
+
+\item{dataSumm$stats}{dataframe produced by ProcessSimDatFile()}
 }
 \value{
 a set of year effects

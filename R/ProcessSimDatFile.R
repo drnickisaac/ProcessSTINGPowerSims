@@ -49,7 +49,7 @@ ProcessSimDatFile <- function(filename,
     else
       stop(paste0(fileNamePath, "not found"))
   }
-  print("done")
+
   # format the data
   formattedData <- formatData(indata)
 
@@ -62,7 +62,7 @@ ProcessSimDatFile <- function(filename,
   # run the model
   modelEff <- runModel(formattedData$dataConstants,
                        formattedData$obsData,
-                       dataSummStats = dataSumm$stats,
+                       dataSumm = dataSumm,
                        useNimble = useNimble,
                        multiSp = multiSp,
                        parallelize = parallelize,
@@ -91,6 +91,7 @@ ProcessSimDatFile <- function(filename,
                                    n.burn = n.burn,
                                    n.thin = n.thin,
                                    n.chain = n.chain),
+                Version = packageVersion("ProcessSTINGPowerSims"),
                 timestamp  = format(Sys.time(), "%y%m%d%H%M%S"))
 
   if(!is.null(outPath)){

@@ -3,7 +3,7 @@
 #' @details Runs the model.
 #' @param dataConstants dataframe produced by ProcessSimDatFile()
 #' @param obsData dataframe produced by ProcessSimDatFile()
-#' @param dataSummStats dataframe produced by ProcessSimDatFile()
+#' @param dataSumm$stats dataframe produced by ProcessSimDatFile()
 #' @param useNimble option to bypass the model fitting in Nimble (just for testing the code)
 #' @param inclPhenology should the model account for seasonal variation?
 #' @param inclPanTrap should the model include pan trap data?
@@ -23,7 +23,7 @@
 
 runModel <- function(dataConstants,
                      obsData,
-                     dataSummStats,
+                     dataSumm,
                      useNimble = TRUE,
                      inclPhenology = TRUE,
                      inclPanTrap = TRUE,
@@ -37,75 +37,75 @@ runModel <- function(dataConstants,
 
   ###################################################################
 
-if(useNimble) {
-  if(is.null(n.burn)) n.burn = n.iter/2
+  if(useNimble) {
+    if(is.null(n.burn)) n.burn = n.iter/2
 
-  ###################################################################
-  # truncate the dataset if there are too many species
-  if(dim(obsData$y1)[1] > maxSp){
-    obsData <- lapply(obsData, function(x) x[1:maxSp,])
-    dataConstants$nsp <- maxSp
-    dataSummStats$occMatrix <- dataSummStats$occMatrix[1:maxSp,,]
-    dataSummStats$naiveOcc <- dataSummStats$naiveOcc[1:maxSp]
-    dataSummStats$reportingRate <- dataSummStats$reportingRate[1:maxSp]
-  }
-
-  ###################################################################
-
-  if(multiSp == TRUE){ # Multispecies option
-
-    # step 1 define the model code
-    modelcode <- defineModel_MS(inclPhenology = inclPhenology, inclPanTrap = inclPanTrap) # this makes no difference!
-
-    # step 2 create an operational from from NIMBLE/BUGS code
-    model <- nimbleModel(code = modelcode,
-                         constants = dataConstants,
-                         data = obsData,
-                         inits = list(z = dataSummStats$occMatrix,
-                                      alpha.s = cloglog(dataSummStats$naiveOcc),
-                                      alpha.p = dataSummStats$reportingRate, # replace with reportingRate_1 when I can calculate it
-                                      beta1 = rep(180, dataConstants$nsp),
-                                      beta2 = rep(50, dataConstants$nsp),
-                                      phScale = rep(1, dataConstants$nsp),
-                                      Multiplier = 1,
-                                      tau.eta = 0.2,
-                                      eta = rnorm(n=dataConstants$nsite, mean=0, sd=2),
-                                      tau.trend = abs(rt(1, 1)),
-                                      Trend = rnorm(n=1))
-    )
-
-    # step 3 build an MCMC object using buildMCMC(). we can add some customization here
-    occMCMC <- buildMCMC(model,
-                       monitors = c("Trend"),
-                       thin = n.thin,
-                       useConjugacy = FALSE) # useConjugacy controls whether conjugate samplers are assigned when possible
-
-    # step 3 before compiling the MCMC object we need to compile the model first
-    Cmodel <- compileNimble(model)
-
-    # now the MCMC (project = NIMBLE model already associated with a project)
-    CoccMCMC <- compileNimble(occMCMC, project = model)
-
-    # and now we can use either $run or runMCMC() on the compiled model object.
-    if(parallelize){
-      av_cores <- parallel::detectCores() - 1
-      runMCMC_samples <- pbmcapply::pbmclapply(1:n.chain, function(i)
-                                runMCMC(
-                                  mcmc = CoccMCMC,
-                                  nburnin = n.burn,
-                                  niter = n.iter,
-                                  nchains = 1, samplesAsCodaMCMC = T),
-                                mc.cores = av_cores)
-
-    } else {
-      runMCMC_samples <- runMCMC(CoccMCMC,
-                               nburnin = n.burn,
-                               niter = n.iter,
-                               nchains = n.chain, samplesAsCodaMCMC = T)
+    ###################################################################
+    # truncate the dataset if there are too many species
+    if(dim(obsData$y1)[1] > maxSp){
+      obsData <- lapply(obsData, function(x) x[1:maxSp,])
+      dataConstants$nsp <- maxSp
+      dataSumm$occMatrix <- dataSumm$occMatrix[1:maxSp,,]
+      dataSumm$stats$naiveOcc <- dataSumm$stats$naiveOcc[1:maxSp]
+      dataSumm$stats$reportingRate <- dataSumm$stats$reportingRate[1:maxSp]
     }
-    yearEff <- runMCMC_samples
 
-  ############################################ end multispecies
+    ###################################################################
+
+    if(multiSp == TRUE){ # Multispecies option
+
+      # step 1 define the model code
+      modelcode <- defineModel_MS(inclPhenology = inclPhenology, inclPanTrap = inclPanTrap) # this makes no difference!
+
+      # step 2 create an operational from from NIMBLE/BUGS code
+      model <- nimbleModel(code = modelcode,
+                           constants = dataConstants,
+                           data = obsData,
+                           inits = list(z = dataSumm$occMatrix,
+                                        alpha.s = cloglog(dataSumm$stats$naiveOcc),
+                                        alpha.p = dataSumm$stats$reportingRate, # replace with reportingRate_1 when I can calculate it
+                                        beta1 = rep(180, dataConstants$nsp),
+                                        beta2 = rep(50, dataConstants$nsp),
+                                        phScale = rep(1, dataConstants$nsp),
+                                        Multiplier = 1,
+                                        tau.eta = 0.2,
+                                        eta = rnorm(n=dataConstants$nsite, mean=0, sd=2),
+                                        tau.trend = abs(rt(1, 1)),
+                                        Trend = rnorm(n=1))
+      )
+
+      # step 3 build an MCMC object using buildMCMC(). we can add some customization here
+      occMCMC <- buildMCMC(model,
+                           monitors = c("Trend"),
+                           thin = n.thin,
+                           useConjugacy = FALSE) # useConjugacy controls whether conjugate samplers are assigned when possible
+
+      # step 3 before compiling the MCMC object we need to compile the model first
+      Cmodel <- compileNimble(model)
+
+      # now the MCMC (project = NIMBLE model already associated with a project)
+      CoccMCMC <- compileNimble(occMCMC, project = model)
+
+      # and now we can use either $run or runMCMC() on the compiled model object.
+      if(parallelize){
+        av_cores <- parallel::detectCores() - 1
+        runMCMC_samples <- pbmcapply::pbmclapply(1:n.chain, function(i)
+          runMCMC(
+            mcmc = CoccMCMC,
+            nburnin = n.burn,
+            niter = n.iter,
+            nchains = 1, samplesAsCodaMCMC = T),
+          mc.cores = av_cores)
+
+      } else {
+        runMCMC_samples <- runMCMC(CoccMCMC,
+                                   nburnin = n.burn,
+                                   niter = n.iter,
+                                   nchains = n.chain, samplesAsCodaMCMC = T)
+      }
+      yearEff <- runMCMC_samples
+
+      ############################################ end multispecies
 
     } else { # sequential single-species option
       # step 1 define the model code
@@ -134,18 +134,20 @@ if(useNimble) {
       # now the MCMC (project = NIMBLE model already associated with a project)
       CoccMCMC <- compileNimble(occMCMC, project = model)
 
-  #######
+      #######
 
-      single_species_model <- function(sp, spDat, dataSummStats, n.iter, Cmodel, CoccMCMC){
+      single_species_model <- function(sp, spDat, dataSumm,
+                                       n.iter, n.burn, n.thin,
+                                       Cmodel, CoccMCMC){
 
         # add the data
         Cmodel$setData(spDat)
 
         # finish initialization
-        Cmodel$setInits(list(z = dataSummStats$occMatrix[sp],
-                        alpha.s = cloglog(dataSummStats$naiveOcc)[sp],
-                        alpha.p = dataSummStats$reportingRate[sp] # replace with reportingRate_1 when I can calculate it
-                        ))
+        Cmodel$setInits(list(z = dataSumm$occMatrix[sp],
+                             alpha.s = cloglog(dataSumm$stats$naiveOcc)[sp],
+                             alpha.p = dataSumm$stats$reportingRate[sp] # replace with reportingRate_1 when I can calculate it
+        ))
 
         # and now we can use $run on the compiled model object.
         samplesList <- list()
@@ -162,33 +164,37 @@ if(useNimble) {
         samplesList <- coda::as.mcmc.list(lapply(samplesList, as.mcmc))
       }
 
-  ####### run the model for each species
+      ####### run the model for each species
 
-    if(parallelize){
+      if(parallelize){
         av_cores <- parallel::detectCores() - 1
         yearEff <- pbmcapply::pbmclapply(1:maxSp, function(i){
           single_species_model(sp=i,
                                spDat=lapply(obsData, function(x) x[i,]),
-                               dataSummStats=dataSummStats,
-                               n.iter=n.iter,
+                               dataSumm=dataSumm,
+                               n.iter = n.iter,
+                               n.burn = n.burn,
+                               n.thin = n.thin,
                                Cmodel, CoccMCMC)
-          },
-          mc.cores = av_cores
+        },
+        mc.cores = av_cores
         )
       } else {
         yearEff <- lapply(1:maxSp, function(i){
           single_species_model(sp=i,
                                spDat=lapply(obsData, function(x) x[i,]),
-                               dataSummStats=dataSummStats,
-                               n.iter=n.iter,
+                               dataSumm = dataSumm,
+                               n.iter = n.iter,
+                               n.burn = n.burn,
+                               n.thin = n.thin,
                                Cmodel, CoccMCMC)
-          }
+        }
         )
       }
-      names(yearEff) <- dimnames(dataSummStats$occMatrix)[[1]][1:maxSp]
+      names(yearEff) <- dimnames(dataSumm$occMatrix)[[1]][1:maxSp]
     }
 
-  #####################################################################
+    #####################################################################
 
   }
   else {
