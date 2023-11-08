@@ -77,13 +77,15 @@ ProcessSimDatFile <- function(filename,
   name <- gsub(filename, patt = "scenario_", repl = "")
   name <- strsplit(name, "/")[[1]]
   name <- name[length(name)]
+  name <- paste0(name, "_Res_",maxSp,"Sp_",n.iter,"it.rds")
 
   # finish up an complete the job
-  output <- list(name = name,
-                md = formattedData$md,
-                dataSumm = dataSumm,
-                modelEff = modelEff,
-                runSettings = c(inclPhenology = inclPhenology,
+  output <- list(dataFileName = filename,
+                 outFileName = name,
+                 md = formattedData$md,
+                 dataSummStats = dataSumm$stats,
+                 modelEff = modelEff,
+                 runSettings = c(inclPhenology = inclPhenology,
                                    inclPanTrap = inclPanTrap,
                                    multiSp = multiSp,
                                    parallelize = parallelize,
@@ -97,7 +99,7 @@ ProcessSimDatFile <- function(filename,
   if(!is.null(outPath)){
     if(!dir.exists(outPath))
       dir.create(outPath)
-    saveRDS(file = file.path(outPath, paste0(name, "_Result.rds")), object = output)
+    saveRDS(file = file.path(outPath, name), object = output)
     return(NULL)
   } else {
     return(output)
