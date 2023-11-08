@@ -36,19 +36,24 @@ ProcessSimDatFile <- function(filename,
 
 #####################################################################
 
+
   #Read in the data; check the file exists then open it
   if(grepl("\\.zip", inPath)){
+    print("trying to open zipfile")
     con <- unz(inPath, filename, open = "rb")
+    print("made the connection")
     fileNamePath <- gzcon(con)
+    print("completed gzcon. Now about to read the file itself")
     indata <- readRDS(fileNamePath)
   } else {
+    print("there is not a zipfile")
     fileNamePath <- file.path(inPath, filename)
     if(file.exists(fileNamePath))
       indata <- readRDS(fileNamePath)
     else
       stop(paste0(fileNamePath, "not found"))
   }
-
+  print("done")
   # format the data
   formattedData <- formatData(indata)
 
