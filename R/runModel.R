@@ -112,14 +112,19 @@ runModel <- function(dataConstants,
 
       # step 2 create an operational from from NIMBLE/BUGS code
       model <- nimbleModel(code = modelcode,
-                           inits = list(beta1 = 180,
+                           constants = dataConstants[!names(dataConstants) %in% "nsp"],
+                           data = lapply(obsData, function(x) x[1,]), # values for species 1
+                           inits = list(z = dataSumm$occMatrix[1,,], # value for species 1
+                                        alpha.s = cloglog(dataSumm$stats$naiveOcc)[1], # value for species 1
+                                        alpha.p = dataSumm$stats$reportingRate[1], # value for species 1
+                                        beta1 = 180,
                                         beta2 = 50,
                                         phScale = 1,
                                         Multiplier = 1,
                                         sd.eta = 2,
                                         eta = rnorm(n=dataConstants$nsite, mean=0, sd=2),
-                                        Trend = rnorm(n=1)),
-                           constants = dataConstants[!names(dataConstants) %in% "nsp"])
+                                        Trend = rnorm(n=1))
+                           )
 
       # step 3 build an MCMC object using buildMCMC(). we can add some customization here
       occMCMC <- buildMCMC(model,
@@ -136,20 +141,24 @@ runModel <- function(dataConstants,
       # now the MCMC (project = NIMBLE model already associated with a project)
       CoccMCMC <- compileNimble(occMCMC, project = model)
 
-      #######
+      ####################################################################################
 
       single_species_model <- function(sp, spDat, dataSumm,
                                        n.iter, n.burn, n.thin,
                                        Cmodel, CoccMCMC){
 
-        # add the data
+        # add the data for the species of interest
         Cmodel$setData(spDat)
 
         # finish initialization
-        Cmodel$setInits(list(z = dataSumm$occMatrix[sp],
+        Cmodel$setInits(list(z = dataSumm$occMatrix[sp,,],
                              alpha.s = cloglog(dataSumm$stats$naiveOcc)[sp],
                              alpha.p = dataSumm$stats$reportingRate[sp] # replace with reportingRate_1 when I can calculate it
         ))
+
+        # test whether the model is fully initialised
+        if(is.na(Cmodel$calculate())) {stop("model not fully initialized")}
+        Cmodel$initializeInfo()
 
         # and now we can use $run on the compiled model object.
         samplesList <- list()
@@ -158,13 +167,13 @@ runModel <- function(dataConstants,
                        nburnin = n.burn,
                        chain = i,
                        thin = n.thin,
-                       reset = TRUE,
-                       time = TRUE)
-          tmp <- as.matrix(CoccMCMC$mvSamples)
-          samplesList[[i]] <- tmp
+                       reset = TRUE)
+          samplesList[[i]] <- as.matrix(CoccMCMC$mvSamples)
         }
         samplesList <- coda::as.mcmc.list(lapply(samplesList, as.mcmc))
       }
+
+      ####################################################################################
 
       ####### run the model for each species
 
