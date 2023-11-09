@@ -20,15 +20,19 @@ summariseData <- function(obsData, dataConstants){
 
   occSpSite <- apply(occMatrix,c(1,2),max)
 
+  # Mean transect count: for calculating stats
+  trMean_1 <- trMean <- (obsData$y2 + obsData$y3)/2
+  trMean_1[trMean_1 == 0] <- NA
+
   return(list(
     occMatrix = occMatrix,
     stats = data.frame(
       species = dimnames(occMatrix)[[1]],
       naiveOcc = apply(occSpSite, 1, mean),
       reportingRate = rowMeans(obsData$y1/5), # per pan trap
-      meanCount = rowMeans(obsData$y2), # not counting the second transect
+      meanCount = rowMeans(trMean), # mean count including zeros
       reportingRate_1 = NA,#mean(with(obsData, y1/5)[occSites,]), # per pan trap. Need to coerce to same shape as above
-      meanCount_1 = NA#mean(obsData$y2[occSites,])
+      meanCount_1 = rowMeans(trMean_1, na.rm=T) # mean count when observed (not on all visits to occupied sites)
     )
   ))
 }

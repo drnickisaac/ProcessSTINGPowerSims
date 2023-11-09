@@ -74,7 +74,7 @@ ProcessSimDatFile <- function(filename,
 
   #clean up the name of the file. Remove the folder names and file suffix
   name <- gsub(filename, patt = "\\.rds", repl = "")
-  name <- gsub(filename, patt = "scenario_", repl = "")
+  name <- gsub(name, patt = "scenario_", repl = "")
   name <- strsplit(name, "/")[[1]]
   name <- name[length(name)]
   name <- paste0(name, "_Res_",maxSp,"Sp_",n.iter,"it.rds")

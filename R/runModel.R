@@ -124,6 +124,9 @@ runModel <- function(dataConstants,
       # step 3 build an MCMC object using buildMCMC(). we can add some customization here
       occMCMC <- buildMCMC(model,
                            monitors = c("mu.lambda",
+                                        'alpha.s', "sd.eta", 'alpha.p',
+                                        "phScale","Multiplier",
+                                        "beta1", "beta2",
                                         "Trend"),
                            useConjugacy = FALSE) # useConjugacy controls whether conjugate samplers are assigned when possible
 
