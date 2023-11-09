@@ -13,6 +13,7 @@ runModel(
   inclPanTrap = TRUE,
   multiSp = TRUE,
   parallelize = FALSE,
+  allPars = FALSE,
   n.iter = 1000,
   n.burn = NULL,
   n.thin = 5,
@@ -34,6 +35,8 @@ runModel(
 \item{multiSp}{should the model be run as a multispecies model, or many single-species models?}
 
 \item{parallelize}{should the chains be run as separate processes on different cores?}
+
+\item{allPars}{if \code{TRUE} then all model parameters are monitored. If \code{FALSE}, just \code{mu.lambda} and \code{Trend}.}
 
 \item{n.iter}{number of iterations for the Nimble model. Default is 1000.}
 

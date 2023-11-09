@@ -9,6 +9,7 @@
 #' @param inclPanTrap should the model include pan trap data?
 #' @param multiSp should the model be run as a multispecies model, or many single-species models?
 #' @param parallelize should the chains be run as separate processes on different cores?
+#' @param allPars if `TRUE` then all model parameters are monitored. If `FALSE`, just `mu.lambda` and `Trend`.
 #' @param n.iter number of iterations for the Nimble model. Default is 1000.
 #' @param n.burn number of iterations for the burn-in. If `NULL` (the default), then it will be set to `n.iter/2`.
 #' @param n.thin thinning for the MCMC chains. Defaults to 5
@@ -29,6 +30,7 @@ runModel <- function(dataConstants,
                      inclPanTrap = TRUE,
                      multiSp = TRUE,
                      parallelize = FALSE,
+                     allPars = FALSE,
                      n.iter = 1000,
                      n.burn = NULL,
                      n.thin = 5,
@@ -127,12 +129,14 @@ runModel <- function(dataConstants,
                            )
 
       # step 3 build an MCMC object using buildMCMC(). we can add some customization here
+      params <- c("mu.lambda","Trend")
+      if(allPars) params <- c(params,
+                              'alpha.s', "sd.eta", 'alpha.p',
+                              "phScale","Multiplier",
+                              "beta1", "beta2")
+
       occMCMC <- buildMCMC(model,
-                           monitors = c("mu.lambda",
-                                        'alpha.s', "sd.eta", 'alpha.p',
-                                        "phScale","Multiplier",
-                                        "beta1", "beta2",
-                                        "Trend"),
+                           monitors = params,
                            useConjugacy = FALSE) # useConjugacy controls whether conjugate samplers are assigned when possible
 
       # step 3 before compiling the MCMC object we need to compile the model first

@@ -7,15 +7,16 @@
 #' @param inPath location where the `filename` can be found
 #' @param outPath location where the results should be written. If `NULL` then results are returned rather than written.
 #' @param useNimble option to bypass the model fitting in Nimble (just for testing the code)
-#' @param n.iter number of iterations for the Nimble model. Default is 1000.
-#' @param n.burn number of iterations for the burn-in. If `NULL` (the default), then it will be set to `n.iter/2`.
-#' @param n.thin thinning for the MCMC chains. Defaults to 5
-#' @param n.chain number of MCMC chains. Defaults to 3
 #' @param inclPhenology should the model account for seasonal variation?
 #' @param inclPanTrap should the model include pan trap data?
 #' @param maxSp defines the maximum number of species to model. Species with numbers greater than this are ignored
 #' @param multiSp should the model be run for each species separately, or in a single model?
 #' @param parallelize option to parallelize across MCMC chains
+#' @param allPars if `TRUE` then all model parameters are monitored. If `FALSE`, just `mu.lambda` and `Trend`.
+#' @param n.iter number of iterations for the Nimble model. Default is 1000.
+#' @param n.burn number of iterations for the burn-in. If `NULL` (the default), then it will be set to `n.iter/2`.
+#' @param n.thin thinning for the MCMC chains. Defaults to 5
+#' @param n.chain number of MCMC chains. Defaults to 3
 #' @return if `outpath` is NULL then a list comprising model output and metadata. Otherwise nothing
 #' @export
 
@@ -28,6 +29,7 @@ ProcessSimDatFile <- function(filename,
                               inclPanTrap = TRUE,
                               multiSp = FALSE,
                               parallelize = FALSE,
+                              allPars = FALSE,
                               n.iter = 1000,
                               n.burn = NULL,
                               n.thin = 5,
@@ -66,6 +68,7 @@ ProcessSimDatFile <- function(filename,
                        useNimble = useNimble,
                        multiSp = multiSp,
                        parallelize = parallelize,
+                       allPars = allPars,
                        n.iter = n.iter,
                        n.burn = n.burn,
                        n.thin = n.thin,

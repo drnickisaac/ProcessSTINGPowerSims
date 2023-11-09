@@ -13,6 +13,7 @@ ProcessSimFolder(
   inclPanTrap = TRUE,
   multiSp = FALSE,
   parallelize = FALSE,
+  allPars = FALSE,
   n.iter = 1000,
   n.burn = NULL,
   n.thin = 5,
@@ -37,6 +38,8 @@ ProcessSimFolder(
 \item{multiSp}{should the model be run for species separately, or in a multispecies model?}
 
 \item{parallelize}{option to parallelize across MCMC chains}
+
+\item{allPars}{if \code{TRUE} then all model parameters are monitored. If \code{FALSE}, just \code{mu.lambda} and \code{Trend}.}
 
 \item{n.iter}{number of iterations for the Nimble model. Default is 1000.}
 
