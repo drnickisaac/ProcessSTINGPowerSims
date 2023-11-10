@@ -40,9 +40,9 @@ defineModel_MS <- function(inclPhenology = TRUE,
           } # Should I add site + year effects to detectability?
 
           ##### transects
-          y2[i,k] ~ dpois(lambdaThin[i,k]) # Observed counts. Might need a NegBin here or Zero-inflated
-          y3[i,k] ~ dpois(lambdaThin[i,k]) # Observed counts. Might need a NegBin here or Zero-inflated
-          lambdaThin[i,k] <- Multiplier * lambda[i, site[k], year[k]] * pThin[i,k]
+          y2[i,k] ~ dpois(expectCount[i,k]) # Observed counts. Might need a NegBin here or Zero-inflated
+          y3[i,k] ~ dpois(expectCount[i,k]) # Observed counts. Might need a NegBin here or Zero-inflated
+          expectCount[i,k] <- Multiplier * lambda[i, site[k], year[k]] * pThin[i,k]
 
           #### shared: phenology
           if(inclPhenology){
@@ -54,19 +54,19 @@ defineModel_MS <- function(inclPhenology = TRUE,
 
     ######################### Obs model priors
     for(i in 1:nsp){alpha.p[i] ~ dunif(0, 1)} # alpha.p is detection probability per pan trap at peak phenology. replace with beta dist
-    Multiplier ~ T(dt(0, 1, 1), 0, Inf)
+    Multiplier ~ T(dt(0, 1, 1), 0, Inf) # expected count per unit of Lambda
 
     ######################### Seasonality shared effect
     if(inclPhenology){
         for(i in 1:nsp){
+          for (d in 1:365){
+            f_JD[i,d] <- 1/((2*3.14159265359)^0.5 * beta2[i]) * exp(-((d - (beta1[i]))^2 / (2* beta2[i]^2)))
+            # could simplify this and evaluate only for dates in the dataset
+            }
           beta1[i] ~ dunif(100, 250) # peak detectability/activity. Constrained to fall within the field season
           beta2[i] ~ T(dt(0, 1, 1), 0, 500) # Half Cauchy. Stdev of phenology. At sd=500 the curve is entirely flat
           phScale[i] ~ T(dt(0, 1, 1), 0, Inf) # Half Cauchy
-
-        for (d in 1:365){
-          f_JD[i,d] <- 1/((2*3.14159265359)^0.5 * beta2[i]) * exp(-((d - (beta1[i]))^2 / (2* beta2[i]^2)))
-          # could simplify this and evaluate only for dates in the dataset
-        }
+          #phScale[i] <- 1/max(f_JD[i,1:365])
       }
     }
     #########################  derived parameters

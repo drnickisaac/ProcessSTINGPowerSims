@@ -67,7 +67,7 @@ runModel <- function(dataConstants,
                                         alpha.p = dataSumm$stats$reportingRate, # replace with reportingRate_1 when I can calculate it
                                         beta1 = rep(180, dataConstants$nsp),
                                         beta2 = rep(50, dataConstants$nsp),
-                                        phScale = rep(1, dataConstants$nsp),
+                                        #phScale = rep(1, dataConstants$nsp),
                                         Multiplier = 1,
                                         sd.eta = 2,
                                         eta = rnorm(n=dataConstants$nsite, mean=0, sd=2),
@@ -121,18 +121,20 @@ runModel <- function(dataConstants,
                                         alpha.p = dataSumm$stats$reportingRate[1], # value for species 1
                                         beta1 = 180,
                                         beta2 = 50,
-                                        phScale = 1,
+                                        #phScale = 1,
                                         Multiplier = 1,
-                                        sd.eta = 2,
-                                        eta = rnorm(n=dataConstants$nsite, mean=0, sd=2),
+                                        #sd.eta = 2,
+                                        #eta = rnorm(n=dataConstants$nsite, mean=0, sd=2),
                                         Trend = rnorm(n=1))
                            )
 
       # step 3 build an MCMC object using buildMCMC(). we can add some customization here
       params <- c("mu.lambda","Trend")
       if(allPars) params <- c(params,
-                              'alpha.s', "sd.eta", 'alpha.p',
-                              "phScale","Multiplier",
+                              'alpha.s', 'alpha.p',
+                              #"sd.eta"
+                              #"phScale",
+                              "Multiplier",
                               "beta1", "beta2")
 
       occMCMC <- buildMCMC(model,

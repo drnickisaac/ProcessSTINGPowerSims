@@ -1,0 +1,155 @@
+---
+title: "STING IDM: Describing the model"
+author: "Nick Isaac"
+date: "20/05/2023"
+output: 
+  html_document:
+    toc: true
+   # theme: united
+---
+
+# Introduction
+This document is one a series exploring the properties of the model proposed for Minimum Viable Scheme for EU Pollinator Monitoring Scheme. 
+
+The model is an "integrated distribution model" fitted using Joint Likelihood. This means that the two data types, pan traps and transect walks, have separate observation processes but share parameters and have a common state variable. We model the state variable as a Poisson point process with intensity `lambda`.
+
+In this document, I describe the single-species variant of the model
+
+# Setup
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(nimble)
+```
+
+
+
+# Define model
+Define the model code in Nimble
+```{r defineModel}
+defineModel_SS <- function(inclPhenology = TRUE,
+                        inclPanTrap = TRUE){
+
+  modelcode <- nimbleCode({
+    ######################### state model
+    for(j in 1:nsite){
+        for(t in 1:nyear){
+          linPred[j,t] <- alpha.s + Trend * t #+ eta[j]
+          log(lambda[j,t]) <- linPred[j,t]
+          cloglog(psi[j,t]) <- linPred[j,t]
+          z[j,t] ~ dbern(psi[j,t]) # True occupancy status
+    }}
+
+    ######################### state model priors
+    #for(j in 1:nsite) {eta[j] ~ dnorm(0, sd=sd.eta)} # site-level random effect
+    #sd.eta ~ T(dt(0, 1, 1), 0, 10) # constrained
+    Trend ~ dnorm(0, tau=0.0001)
+    alpha.s ~ dnorm(0, tau=0.0001)
+
+    ######################### Obs model
+    for(k in 1:nvisit) {
+          ##### pan traps
+          if(inclPanTrap){
+            y1[k] ~ dbin(size = nT[k], prob = Py[k]) # Observed data
+            Py[k] <- z[site[k], year[k]] * p1[k]
+            p1[k] <- alpha.p * pThin[k]
+          } # Should I add site + year effects to detectability?
+
+          ##### transects
+          y2[k] ~ dpois(expectCount[k]) # Observed counts. Might need a NegBin here or Zero-inflated
+          y3[k] ~ dpois(expectCount[k]) # Observed counts. Might need a NegBin here or Zero-inflated
+          expectCount[k] <- Multiplier * lambda[site[k], year[k]] * pThin[k]
+
+          #### shared: phenology
+          if(inclPhenology){
+            logit(pThin[k]) <- phScale * f_JD[JulDate[k]] # assuming no site effect here
+          } else {
+            pThin[k] <- 1
+          }
+    }
+
+    ######################### Obs model priors
+    alpha.p ~ dunif(0, 1) # alpha.p is detection probability per pan trap at peak phenology. replace with beta dist
+    Multiplier ~ T(dt(0, 1, 1), 0, Inf) # expected count per unit of lambda
+
+    ######################### Seasonality shared effect
+    if(inclPhenology){
+         for (d in 1:365){
+          f_JD[d] <- 1/((2*3.14159265359)^0.5 * beta2) * exp(-((d - (beta1))^2 / (2* beta2^2)))
+          # could simplify this and evaluate only for dates in the dataset
+         }
+      beta1 ~ dunif(100, 250) # peak detectability/activity. Constrained to fall within the field season
+      beta2 ~ T(dt(0, 1, 1), 0, 500) # Half Cauchy. Stdev of phenology. At sd=500 the curve is entirely flat
+      #phScale ~ T(dt(0, 1, 1), 0, Inf) # Half Cauchy
+      phScale <- 1/max(f_JD[1:365])
+      }
+
+    #########################  derived parameters
+    for(t in 1:nyear){
+      #psi.fs[t] <- mean(z[1:nsite],t)
+      mu.lambda[t] <- mean(lambda[1:nsite,t])
+    }
+  })
+  return(modelcode)
+}
+```
+
+Define the full model by calling the function above.
+I would like to define obsMod & these dynamically and pass them as arguments, but it throws an error I don't understand.
+```{r}
+obsMod <- TRUE
+inclPhenology <- TRUE
+modelcode <- defineModel()
+```
+
+
+## Explain parameters
+The model is splt into several sections:
+
+### Observations
+`y1[k]` is the observed number of trap locations (out of `nT[k]`) where the focal species was recorded on visit `k`.
+
+`y2[k]` is the number of individuals of the focal species observed on a transect walk A on visit `j` to site `i`.
+`y3[k]` is the number of individuals of the focal species observed on a transect walk B on visit `j` to site `i`.
+
+### other data
+`nT[k]` is the number of trap locations that were surveyed on visit `k`. Typically this is fixed at 5.
+
+`JulDate[k]` is the Julian Date (1 = 1st January, i.e. 182 = 1st July) of the `k`th visit.
+
+### State sub-model parameters
+`lambda[i]` represents the intensity of the point process for site `i`. You can think of the intensity as the expected number of organisms present at the site.
+
+`psi[i]` is the occupancy probability at site `i`. Linked to `linPred[i]` by the complementary log-log link, which defines the probability that at least one individual is present.
+
+`alpha.s[i]` defines the expected value of `lambda[i]` in year zero at site `i`.
+
+`Trend` is the linear trend (per year) in the log of `mu.lambda`
+
+`linPred[i]` is the linear predictor of a GLM for site `i`. It also defines the link between `lambda` and `psi`.
+
+`eta[i]` is a site-specific random effect. Currently not used.
+
+
+### Pan trap sub-model
+`Py[k]` the probability, per trap location, of capturing/recording the focal species (i.e. the detection probability) on visit `k` 
+
+`alpha.p` the probability of observing the focal species, per pan trap location, at the seasonal peak abundance (i.e. when `JulDate = beta1`).
+
+### Transect sub-model
+`Multiplier` is the expected number of organisms on a transect per unit of intensity (`lambda`).
+
+### Phenology (aka seasonal) variation
+Seasonal variation is defined in terms of thinning of the point process 
+
+`pThin[k]` the thinning factor at visit `j` to site `i`. It "thins" the point process by a factor determined by the phenology. It can be thought of as the abundance on visit `j`, expressed as a proportion of the maximum abundance during the season (i.e. when `JulDate = beta1`).
+
+`beta1` the date of maximum abundance (same units as `JulDate`)
+
+`beta2` the standard deviation, in days, of the detection phenology (which is modelled as a Gaussian curve)
+
+`phScale` is a scaling parameter on the seasonal phenology effect. I have tried variants in which this is fixed and where it is a parameter estimated from data.
+
+### Derived parameters
+`psi.fs` is the finite sample occupancy, i.e. the proportion of sites estimated to be occupied by the model
+
+`mu.lambda` is the mean intensity across all sites.
