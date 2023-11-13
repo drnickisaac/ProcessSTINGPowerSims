@@ -52,7 +52,7 @@ ProcessSimDatFile <- function(filename,
       stop(paste0(fileNamePath, "not found"))
   }
 
-  print(paste("Successfully read in", fileNamePath))
+  print(paste("Successfully read in", filename))
 
   # format the data
   formattedData <- formatData(indata)
