@@ -121,7 +121,7 @@ runModel <- function(dataConstants,
                                         alpha.p = dataSumm$stats$reportingRate[1], # value for species 1
                                         beta1 = 180,
                                         beta2 = 50,
-                                        #phScale = 1,
+                                        phScale = 1,
                                         Multiplier = 1,
                                         #sd.eta = 2,
                                         #eta = rnorm(n=dataConstants$nsite, mean=0, sd=2),
@@ -133,7 +133,7 @@ runModel <- function(dataConstants,
       if(allPars) params <- c(params,
                               'alpha.s', 'alpha.p',
                               #"sd.eta"
-                              #"phScale",
+                              "phScale",
                               "Multiplier",
                               "beta1", "beta2")
 
