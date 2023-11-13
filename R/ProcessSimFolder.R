@@ -52,10 +52,13 @@ ProcessSimFolder <- function(inPath = ".",
   # in either case, restrict to the set that are rds files
   simfiles <- simfiles[grepl("\\.rds", simfiles)]
 
+  # restrict the set of files to the number determined by maxFiles
+  if(length(simfiles) > maxFiles)  simfiles <- simfiles[1:maxFiles]
+
   # create an output directory
   if(!dir.exists(outPath)) dir.create(outPath)
 
-  output <- lapply(simfiles[1:maxFiles],
+  output <- lapply(simfiles,
                    ProcessSimDatFile,
                    inPath = inPath,
                    outPath = ifelse(collateOutput, NULL, outPath),
