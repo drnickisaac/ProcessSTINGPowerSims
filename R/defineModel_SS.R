@@ -39,7 +39,7 @@ defineModel_SS <- function(inclPhenology = TRUE,
           y3[k] ~ dpois(expectCount[k]) # Observed counts. Might need a NegBin here or Zero-inflated
           #expectCount[k] <- Multiplier * lambda[site[k], year[k]] * pThin[k]
           log(expectCount[k]) <- linPred[site[k], year[k]] * log(p2[k])
-          logit(p2[k]) <- gamma.0 * gamma.1 * f_JD[JulDate[k]]
+          logit(p2[k]) <- gamma.0 + gamma.1 * f_JD[JulDate[k]]
 
           #### shared: phenology
           #if(inclPhenology){
