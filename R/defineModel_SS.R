@@ -30,25 +30,31 @@ defineModel_SS <- function(inclPhenology = TRUE,
           if(inclPanTrap){
             y1[k] ~ dbin(size = nT[k], prob = Py[k]) # Observed data
             Py[k] <- z[site[k], year[k]] * p1[k]
-            p1[k] <- alpha.p * pThin[k]
+            logit(p1[k]) <- alpha.0 + alpha.1 * f_JD[JulDate[k]]
+            #p1[k] <- alpha.p * pThin[k]
           } # Should I add site + year effects to detectability?
 
           ##### transects
           y2[k] ~ dpois(expectCount[k]) # Observed counts. Might need a NegBin here or Zero-inflated
           y3[k] ~ dpois(expectCount[k]) # Observed counts. Might need a NegBin here or Zero-inflated
-          expectCount[k] <- Multiplier * lambda[site[k], year[k]] * pThin[k]
+          #expectCount[k] <- Multiplier * lambda[site[k], year[k]] * pThin[k]
+          log(expectCount[k]) <- linPred[site[k], year[k]] * log(p2[k])
+          logit(p2) <- gamma.0 * gamma.1 * f_JD[JulDate[k]]
 
           #### shared: phenology
-          if(inclPhenology){
-            logit(pThin[k]) <- phScale * f_JD[JulDate[k]] # assuming no site effect here
-          } else {
-            pThin[k] <- 1
-          }
+          #if(inclPhenology){
+          #  logit(pThin[k]) <- phScale * f_JD[JulDate[k]] # assuming no site effect here
+          #} else {
+          #  pThin[k] <- 1
+          #}
     }
 
     ######################### Obs model priors
-    alpha.p ~ dunif(0, 1) # alpha.p is detection probability per pan trap at peak phenology. replace with beta dist
-    Multiplier ~ T(dt(0, 1, 1), 0, Inf) # expected count per unit of lambda
+    alpha.0 ~ dnorm(-2, tau = 0.0001) # alpha.p is logit detection probability per pan trap at peak phenology.
+    alpha.1 ~ T(dt(0, 1, 1), 0, Inf) # scaling parameter for detection on pan trap
+    gamma.0 ~ dnorm(-2, tau = 0.0001) # intercept of detection probability GLM on transects
+    gamma.1 ~ T(dt(0, 1, 1), 0, Inf) # slope of detection probability GLM on transects
+    #Multiplier ~ T(dt(0, 1, 1), 0, Inf) # expected count per unit of lambda
 
     ######################### Seasonality shared effect
     if(inclPhenology){
@@ -58,8 +64,10 @@ defineModel_SS <- function(inclPhenology = TRUE,
          }
       beta1 ~ dunif(100, 250) # peak detectability/activity. Constrained to fall within the field season
       beta2 ~ T(dt(0, 1, 1), 0, 500) # Half Cauchy. Stdev of phenology. At sd=500 the curve is entirely flat
-      phScale ~ T(dt(0, 1, 1), 0, Inf) # Half Cauchy
+      #phScale ~ T(dt(0, 1, 1), 0, Inf) # Half Cauchy
       #phScale <- 1/max(f_JD[1:365])
+      } else {
+        f_JD[1:365] <- 1/365
       }
 
     #########################  derived parameters

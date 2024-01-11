@@ -118,11 +118,14 @@ runModel <- function(dataConstants,
                            data = lapply(obsData, function(x) x[1,]), # values for species 1
                            inits = list(z = dataSumm$occMatrix[1,,], # value for species 1
                                         alpha.s = cloglog(dataSumm$stats$naiveOcc)[1], # value for species 1
-                                        alpha.p = dataSumm$stats$reportingRate[1], # value for species 1
+                                        alpha.0 = dataSumm$stats$reportingRate[1], # value for species 1
+                                        alpha.1 = 1,
+                                        gamma.0 = 0,
+                                        gamma.1 = 1,
                                         beta1 = 180,
                                         beta2 = 50,
-                                        phScale = 1,
-                                        Multiplier = 1,
+                                        #phScale = 1,
+                                        #Multiplier = 1,
                                         #sd.eta = 2,
                                         #eta = rnorm(n=dataConstants$nsite, mean=0, sd=2),
                                         Trend = rnorm(n=1))
@@ -131,10 +134,11 @@ runModel <- function(dataConstants,
       # step 3 build an MCMC object using buildMCMC(). we can add some customization here
       params <- c("mu.lambda","Trend")
       if(allPars) params <- c(params,
-                              'alpha.s', 'alpha.p',
+                              'alpha.s',
+                              'alpha.0','alpha.1',
+                              'gamma.0','gamma.1',
                               #"sd.eta"
-                              "phScale",
-                              "Multiplier",
+                              #"phScale","Multiplier","alpha.p"
                               "beta1", "beta2")
 
       occMCMC <- buildMCMC(model,
