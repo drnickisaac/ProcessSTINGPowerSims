@@ -164,7 +164,7 @@ runModel <- function(dataConstants,
         # finish initialization
         Cmodel$setInits(list(z = dataSumm$occMatrix[sp,,],
                              alpha.s = cloglog(dataSumm$stats$naiveOcc)[sp],
-                             alpha.p = dataSumm$stats$reportingRate[sp] # replace with reportingRate_1 when I can calculate it
+                             alpha.0 = dataSumm$stats$reportingRate[sp] # replace with reportingRate_1 when I can calculate it
         ))
 
         # test whether the model is fully initialised

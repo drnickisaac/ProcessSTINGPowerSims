@@ -1,13 +1,12 @@
 Package: ProcessSTINGPowerSims
 Title: Analyse Outputs from STING2 Power Simulations
-Version: 0.6.6
+Version: 0.6.9
 Date: 2024-01-12
 Authors@R: 
     person("Nick", "Isaac", , "njbi@ceh.ac.uk", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-4869-8052"))
 Description: Analyse Outputs from STING2 Power Simulations
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+License: `use_mit_license()`
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3

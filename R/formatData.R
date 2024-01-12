@@ -21,15 +21,16 @@ formatData <- function(inData, minSite = 1){
                                value.var = "obs",
                                fun = function(x) length(x) > 0, fill = 0)
     sp_n_Site <- colSums(site_sp)
-    sp2incl <- names(sp_n_Site[sp_n_Site > minSite])
-    inData <- subset(inData, species %in% sp2incl)
+    sp2incl <- which(sp_n_Site > minSite)
     nExcl <- length(sp_n_Site) - length(sp2incl)
     print(paste('Note:',nExcl,'species out of', length(sp_n_Site), 'have been excluded because they occur on fewer than', minSite, 'sites'))
     print(paste('We proceed to modelling with', length(sp2incl), 'species'))
     md$sp_modelled <- length(sp2incl)
   } else md$sp_modelled <- md$sp_obs
 
-  dataConstants <- list(nsp = md$sp_obs,
+  md$minSite <- minSite
+
+  dataConstants <- list(nsp = md$sp_modelled,
                         nsite = md$sites,
                         nvisit = nrow(castDat),
                         nyear = md$years,
@@ -47,9 +48,9 @@ formatData <- function(inData, minSite = 1){
                     value.var = "obs2", fill=0)
 
   # observations have to be transposed because we have coded species as the first dimension
-  obsData <- list(y1 = t(ObsPan),
-                  y2 = t(trCount1),
-                  y3 = t(trCount2))
+  obsData <- list(y1 = t(ObsPan)[sp2incl,],
+                  y2 = t(trCount1)[sp2incl,],
+                  y3 = t(trCount2)[sp2incl,])
 
   return(list(dataConstants = dataConstants,
               obsData = obsData,
