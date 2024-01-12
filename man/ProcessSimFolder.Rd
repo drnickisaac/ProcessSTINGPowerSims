@@ -18,6 +18,7 @@ ProcessSimFolder(
   n.burn = NULL,
   n.thin = 5,
   n.chain = 3,
+  minSite = 1,
   maxSp = 9999,
   maxFiles = 9999
 )
@@ -48,6 +49,8 @@ ProcessSimFolder(
 \item{n.thin}{thinning for the MCMC chains. Defaults to 5}
 
 \item{n.chain}{number of MCMC chains. Defaults to 3}
+
+\item{minSite}{the threshold minimum number of sites for a species to be considered for modelling}
 
 \item{maxSp}{defines the maximum number of species to model. Species with numbers greater than this are ignored}
 

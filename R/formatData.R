@@ -8,7 +8,7 @@
 #' @import reshape2
 #' @export
 
-formatData <- function(inData, minSite){
+formatData <- function(inData, minSite = 1){
 
   castDat <- dcast(inData, year + round + siteID + jday + total_pantraps ~ "nsp",
                    value.var = "abundance", fun = length, fill = 0)
@@ -26,7 +26,8 @@ formatData <- function(inData, minSite){
     nExcl <- length(sp_n_Site) - length(sp2incl)
     print(paste('Note:',nExcl,'species out of', length(sp_n_Site), 'have been excluded because they occur on fewer than', minSite, 'sites'))
     print(paste('We proceed to modelling with', length(sp2incl), 'species'))
-  }
+    md$sp_modelled <- length(sp2incl)
+  } else md$sp_modelled <- md$sp_obs
 
   dataConstants <- list(nsp = md$sp_obs,
                         nsite = md$sites,
