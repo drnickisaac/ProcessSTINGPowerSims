@@ -43,12 +43,14 @@ runModel <- function(dataConstants,
     if(is.null(n.burn)) n.burn = n.iter/2
 
     ###################################################################
+    # SELECT SPECIES TO MODEL
     # truncate the dataset if there are too many species
     if(dim(obsData$y1)[1] > maxSp){
       obsData <- lapply(obsData, function(x) x[1:maxSp,])
       dataSumm$occMatrix <- dataSumm$occMatrix[1:maxSp,,]
       dataSumm$stats <- dataSumm$stats[1:maxSp,]
       dataConstants$nsp <- maxSp
+      print(paste('Warning: only the first', maxSp, 'will be used in modelling: others will be ignored'))
     }
 
     ###################################################################
@@ -120,7 +122,7 @@ runModel <- function(dataConstants,
                                         alpha.s = cloglog(dataSumm$stats$naiveOcc)[1], # value for species 1
                                         alpha.0 = dataSumm$stats$reportingRate[1], # value for species 1
                                         alpha.1 = 1,
-                                        gamma.0 = 0,
+                                        gamma.0 = -2,
                                         gamma.1 = 1,
                                         beta1 = 180,
                                         beta2 = 50,

@@ -9,7 +9,6 @@
 #' @param useNimble option to bypass the model fitting in Nimble (just for testing the code)
 #' @param inclPhenology should the model account for seasonal variation?
 #' @param inclPanTrap should the model include pan trap data?
-#' @param maxSp defines the maximum number of species to model. Species with numbers greater than this are ignored
 #' @param multiSp should the model be run for each species separately, or in a single model?
 #' @param parallelize option to parallelize across MCMC chains
 #' @param allPars if `TRUE` then all model parameters are monitored. If `FALSE`, just `mu.lambda` and `Trend`.
@@ -17,7 +16,10 @@
 #' @param n.burn number of iterations for the burn-in. If `NULL` (the default), then it will be set to `n.iter/2`.
 #' @param n.thin thinning for the MCMC chains. Defaults to 5
 #' @param n.chain number of MCMC chains. Defaults to 3
+#' @param minSite the threshold minimum number of sites for a species to be considered for modelling
+#' @param maxSp defines the maximum number of species to model. Species with numbers greater than this are ignored
 #' @return if `outpath` is NULL then a list comprising model output and metadata. Otherwise nothing
+#' @import reshape2
 #' @export
 
 
@@ -34,6 +36,7 @@ ProcessSimDatFile <- function(filename,
                               n.burn = NULL,
                               n.thin = 5,
                               n.chain = 3,
+                              minSite = 1,
                               maxSp = 9999){
 
 #####################################################################
@@ -53,6 +56,19 @@ ProcessSimDatFile <- function(filename,
   }
 
   print(paste("Successfully read in", filename))
+
+  # now restrict the data to species that occur on at least `minSite` sites
+  if(minSite > 1){
+    site_sp <- reshape2::acast(indata, siteID ~ species,
+                               value.var = "obs",
+                               fun = function(x) length(x) > 0, fill = 0)
+    sp_n_Site <- colSums(site_sp)
+    sp2incl <- names(sp_n_Site[sp_n_Site > minSite])
+    indata <- subset(indata, species %in% sp2incl)
+    nExcl <- length(sp_n_Site) - length(sp2incl)
+    print(paste('Note:',nExcl,'species out of', length(sp_n_Site), 'have been excluded because they occur on fewer than', minSite, 'sites'))
+    print(paste('We proceed to modelling with', length(sp2incl), 'species'))
+  }
 
   # format the data
   formattedData <- formatData(indata)
@@ -99,7 +115,7 @@ ProcessSimDatFile <- function(filename,
                                    n.thin = n.thin,
                                    n.chain = n.chain),
                 Version = packageVersion("ProcessSTINGPowerSims"),
-                timestamp  = format(Sys.time(), "%y%m%d%H%M%S"))
+                timestamp  = format(Sys.time(), "%y-%m-%d %H:%M:%S"))
 
   if(!is.null(outPath)){
     if(!dir.exists(outPath))

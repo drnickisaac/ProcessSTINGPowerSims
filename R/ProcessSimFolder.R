@@ -17,6 +17,7 @@
 #' @param n.burn number of iterations for the burn-in. If `NULL` (the default), then it will be set to `n.iter/2`.
 #' @param n.thin thinning for the MCMC chains. Defaults to 5
 #' @param n.chain number of MCMC chains. Defaults to 3
+#' @param minSite the threshold minimum number of sites for a species to be considered for modelling
 #' @param maxSp defines the maximum number of species to model. Species with numbers greater than this are ignored
 #' @param maxFiles defines the maximum number of files to work with. Additional files are ignored
 #' @return Nothing
@@ -36,6 +37,7 @@ ProcessSimFolder <- function(inPath = ".",
                             n.burn = NULL,
                             n.thin = 5,
                             n.chain = 3,
+                            minSite = 1,
                             maxSp = 9999,
                             maxFiles = 9999){
 
@@ -72,6 +74,7 @@ ProcessSimFolder <- function(inPath = ".",
                    n.thin = n.thin,
                    n.chain = n.chain,
                    multiSp = multiSp,
+                   minSite = minSite,
                    maxSp = maxSp)
 
   if(collateOutput){
