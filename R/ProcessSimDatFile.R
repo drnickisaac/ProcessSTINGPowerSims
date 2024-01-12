@@ -60,7 +60,7 @@ ProcessSimDatFile <- function(filename,
   formattedData <- formatData(indata, minSite = minSite)
 
   # if appropriate, limit the number of species
-  formattedData$md$maxSp <- min(maxSp, formattedData$md$sp_obs)
+  formattedData$md$maxSp <- min(maxSp, formattedData$md$sp_modelled)
 
   # SUMMARISE the data
   dataSumm <- with(formattedData, summariseData(obsData, dataConstants))
