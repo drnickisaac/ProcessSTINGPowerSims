@@ -4,10 +4,12 @@
 \alias{formatData}
 \title{formatData}
 \usage{
-formatData(inData)
+formatData(inData, minSite = 1)
 }
 \arguments{
 \item{inData}{A dataset produced by the simulations}
+
+\item{minSite}{the threshold minimum number of sites for a species to be considered for modelling}
 }
 \value{
 list of two data frames
