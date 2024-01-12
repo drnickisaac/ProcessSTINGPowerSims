@@ -43,7 +43,6 @@ runModel <- function(dataConstants,
     if(is.null(n.burn)) n.burn = n.iter/2
 
     ###################################################################
-    # SELECT SPECIES TO MODEL
     # truncate the dataset if there are too many species
     if(dim(obsData$y1)[1] > maxSp){
       obsData <- lapply(obsData, function(x) x[1:maxSp,])

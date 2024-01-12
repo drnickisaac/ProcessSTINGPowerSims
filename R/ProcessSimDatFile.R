@@ -19,7 +19,6 @@
 #' @param minSite the threshold minimum number of sites for a species to be considered for modelling
 #' @param maxSp defines the maximum number of species to model. Species with numbers greater than this are ignored
 #' @return if `outpath` is NULL then a list comprising model output and metadata. Otherwise nothing
-#' @import reshape2
 #' @export
 
 
@@ -57,21 +56,8 @@ ProcessSimDatFile <- function(filename,
 
   print(paste("Successfully read in", filename))
 
-  # now restrict the data to species that occur on at least `minSite` sites
-  if(minSite > 1){
-    site_sp <- reshape2::acast(indata, siteID ~ species,
-                               value.var = "obs",
-                               fun = function(x) length(x) > 0, fill = 0)
-    sp_n_Site <- colSums(site_sp)
-    sp2incl <- names(sp_n_Site[sp_n_Site > minSite])
-    indata <- subset(indata, species %in% sp2incl)
-    nExcl <- length(sp_n_Site) - length(sp2incl)
-    print(paste('Note:',nExcl,'species out of', length(sp_n_Site), 'have been excluded because they occur on fewer than', minSite, 'sites'))
-    print(paste('We proceed to modelling with', length(sp2incl), 'species'))
-  }
-
-  # format the data
-  formattedData <- formatData(indata)
+  # format the data (includes removing species found on few sites)
+  formattedData <- formatData(indata, minSite = minSite)
 
   # if appropriate, limit the number of species
   formattedData$md$maxSp <- min(maxSp, formattedData$md$sp_obs)
