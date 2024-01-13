@@ -158,11 +158,18 @@ runModel <- function(dataConstants,
                                        n.iter, n.burn, n.thin,
                                        Cmodel, CoccMCMC){
 
+        # apparent occupancy for this species
+        Z <- dataSumm$occMatrix[sp,,]
+        nS <- rowSums(Z>0)
+
+        # write a helpful message
+        print(paste("Now running species", sp, ", which is present on", nS, "sites"))
+
         # add the data for the species of interest
         Cmodel$setData(spDat)
 
         # finish initialization
-        Cmodel$setInits(list(z = dataSumm$occMatrix[sp,,],
+        Cmodel$setInits(list(z = Z,
                              alpha.s = cloglog(dataSumm$stats$naiveOcc)[sp],
                              alpha.0 = dataSumm$stats$reportingRate[sp] # replace with reportingRate_1 when I can calculate it
         ))
