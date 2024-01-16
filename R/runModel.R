@@ -155,7 +155,7 @@ runModel <- function(dataConstants,
       ####################################################################################
 
       single_species_model <- function(sp, spDat, dataSumm,
-                                       n.iter, n.burn, n.thin,
+                                       n.iter, n.burn, n.thin, n.chain,
                                        Cmodel, CoccMCMC){
 
         # apparent occupancy for this species
@@ -204,6 +204,7 @@ runModel <- function(dataConstants,
                                n.iter = n.iter,
                                n.burn = n.burn,
                                n.thin = n.thin,
+                               n.chain = n.chain,
                                Cmodel, CoccMCMC)
         },
         mc.cores = av_cores
@@ -216,6 +217,7 @@ runModel <- function(dataConstants,
                                n.iter = n.iter,
                                n.burn = n.burn,
                                n.thin = n.thin,
+                               n.chain = n.chain,
                                Cmodel, CoccMCMC)
         }
         )
