@@ -43,6 +43,9 @@ runModel <- function(dataConstants,
     if(is.null(n.burn)) n.burn = n.iter/2
 
     ###################################################################
+    # kludge required: if maxSp is set to 1 (or zero) then problems arise later.
+    if(maxSp < 2) maxSp <- 2
+
     # truncate the dataset if there are too many species
     if(dim(obsData$y1)[1] > maxSp){
       obsData <- lapply(obsData, function(x) x[1:maxSp,])

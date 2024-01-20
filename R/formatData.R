@@ -18,7 +18,7 @@ formatData <- function(inData, minSite = 1){
   # now restrict the data to species that occur on at least `minSite` sites
   if(minSite > 1){
     site_sp <- reshape2::acast(inData, siteID ~ species,
-                               value.var = "obs",
+                               value.var = "obs_transect1",
                                fun = function(x) length(x) > 0, fill = 0)
     sp_n_Site <- colSums(site_sp)
     sp2incl <- which(sp_n_Site > minSite)
@@ -43,9 +43,9 @@ formatData <- function(inData, minSite = 1){
   ObsPan <- acast(inData, year + round + siteID ~ species,
                   value.var = "presences_pan", fill = 0)
   trCount1 <- acast(inData, year + round + siteID ~ species,
-                    value.var = "obs", fill=0)
+                    value.var = "obs_transect1", fill=0)
   trCount2 <- acast(inData, year + round + siteID ~ species,
-                    value.var = "obs2", fill=0)
+                    value.var = "obs_transect2", fill=0)
 
   # observations have to be transposed because we have coded species as the first dimension
   obsData <- list(y1 = t(ObsPan)[sp2incl,],
