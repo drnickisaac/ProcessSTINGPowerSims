@@ -10,8 +10,11 @@
 
 summariseData <- function(obsData, dataConstants){
 
+  # calculate for each visit whether the species was observed
+  obs <- with(obsData, y1 + y2 + y3)
+
   # which sites are occupied?
-  temp <- data.frame(cbind(site=dataConstants$site, year=dataConstants$year, t(obsData$y1)))
+  temp <- data.frame(cbind(site=dataConstants$site, year=dataConstants$year, t(obs)))
   temp <- melt(temp, id=1:2) %>%
     mutate(value = value>0) %>%
     group_by(site, year, variable) %>%

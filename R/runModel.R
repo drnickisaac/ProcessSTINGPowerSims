@@ -165,8 +165,10 @@ runModel <- function(dataConstants,
         Z <- dataSumm$occMatrix[sp,,]
         nS <- rowSums(Z>0)
 
+        spName <- dataSumm$stats$species
+
         # write a helpful message
-        print(paste("Now running species", sp, ", which is present on", nS, "sites"))
+        print(paste("Now running", spName[sp], ", which is present on", nS, "sites"))
 
         # add the data for the species of interest
         Cmodel$setData(spDat)

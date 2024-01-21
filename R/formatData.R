@@ -15,24 +15,22 @@ formatData <- function(inData, minSite = 1){
 
   md <- formatMetadata(inData)
 
-  # temp kludge: if the second transect data is NA, set to zero
-  #inData$obs_transect2[is.na(inData$obs_transect2)] <- 0
+  # set the minimum number of sites, as there are some species that were never observed.
+  if(minSite < 1) minSite <- 1
 
   # now restrict the data to species that occur on at least `minSite` sites
-  if(minSite > 0){
-    # sum across all three data types: was the species ever observed?
-    indata$obs <- rowSums(indata[, c("presences_pan", "obs_transect1", "obs_transect2")], na.rm=TRUE) > 0
+  # sum across all three data types: was the species ever observed?
+  indata$obs <- rowSums(indata[, c("presences_pan", "obs_transect1", "obs_transect2")], na.rm=TRUE) > 0
 
-    # apparent occupancy matrix across all species:site combos for all data types
-    sp_site <- (acast(indata, species~siteID, value.var = "obs", function(x) max(x) > 0, fill = 0))
+  # apparent occupancy matrix across all species:site combos for all data types
+  sp_site <- (acast(indata, species~siteID, value.var = "obs", function(x) max(x) > 0, fill = 0))
 
-    sp_n_Site <- rowSums(sp_site)
-    sp2incl <- which(sp_n_Site > minSite)
-    nExcl <- length(sp_n_Site) - length(sp2incl)
-    print(paste('Note:',nExcl,'species out of', length(sp_n_Site), 'have been excluded because they occur on fewer than', minSite, 'sites'))
-    print(paste('We proceed to modelling with', length(sp2incl), 'species'))
-    md$sp_modelled <- length(sp2incl)
-  } else md$sp_modelled <- md$sp_obs
+  sp_n_Site <- rowSums(sp_site)
+  sp2incl <- which(sp_n_Site > minSite)
+  nExcl <- length(sp_n_Site) - length(sp2incl)
+  print(paste('Note:',nExcl,'species out of', length(sp_n_Site), 'have been excluded because they occur on fewer than', minSite, 'sites'))
+  print(paste('We proceed to modelling with', length(sp2incl), 'species'))
+  md$sp_modelled <- length(sp2incl)
 
   md$minSite <- minSite
 
@@ -51,7 +49,7 @@ formatData <- function(inData, minSite = 1){
   trCount1 <- acast(inData, year + round + siteID ~ species,
                     value.var = "obs_transect1", fill=0)
   trCount2 <- acast(inData, year + round + siteID ~ species,
-                    value.var = "obs_transect2", fill=0)
+                    value.var = "obs_transect2", fill=0) # not quite sure why, but this turns NAs into 0s
 
   # observations have to be transposed because we have coded species as the first dimension
   obsData <- list(y1 = t(ObsPan)[sp2incl,],
