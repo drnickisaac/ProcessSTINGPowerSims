@@ -15,12 +15,18 @@ formatData <- function(inData, minSite = 1){
 
   md <- formatMetadata(inData)
 
+  # temp kludge: if the second transect data is NA, set to zero
+  #inData$obs_transect2[is.na(inData$obs_transect2)] <- 0
+
   # now restrict the data to species that occur on at least `minSite` sites
-  if(minSite > 1){
-    site_sp <- reshape2::acast(inData, siteID ~ species,
-                               value.var = "obs_transect1",
-                               fun = function(x) length(x) > 0, fill = 0)
-    sp_n_Site <- colSums(site_sp)
+  if(minSite > 0){
+    # sum across all three data types: was the species ever observed?
+    indata$obs <- rowSums(indata[, c("presences_pan", "obs_transect1", "obs_transect2")], na.rm=TRUE) > 0
+
+    # apparent occupancy matrix across all species:site combos for all data types
+    sp_site <- (acast(indata, species~siteID, value.var = "obs", function(x) max(x) > 0, fill = 0))
+
+    sp_n_Site <- rowSums(sp_site)
     sp2incl <- which(sp_n_Site > minSite)
     nExcl <- length(sp_n_Site) - length(sp2incl)
     print(paste('Note:',nExcl,'species out of', length(sp_n_Site), 'have been excluded because they occur on fewer than', minSite, 'sites'))
