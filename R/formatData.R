@@ -20,10 +20,10 @@ formatData <- function(inData, minSite = 1){
 
   # now restrict the data to species that occur on at least `minSite` sites
   # sum across all three data types: was the species ever observed?
-  indata$obs <- rowSums(indata[, c("presences_pan", "obs_transect1", "obs_transect2")], na.rm=TRUE) > 0
+  inData$obs <- rowSums(inData[, c("presences_pan", "obs_transect1", "obs_transect2")], na.rm=TRUE) > 0
 
   # apparent occupancy matrix across all species:site combos for all data types
-  sp_site <- (acast(indata, species~siteID, value.var = "obs", function(x) max(x) > 0, fill = 0))
+  sp_site <- (acast(inData, species~siteID, value.var = "obs", function(x) max(x) > 0, fill = 0))
 
   sp_n_Site <- rowSums(sp_site)
   sp2incl <- which(sp_n_Site > minSite)

@@ -39,6 +39,11 @@ runModel <- function(dataConstants,
 
   ###################################################################
 
+  if(grepl("x86", sessionInfo()$platform) & parallelize == TRUE){
+    warning("Parallelization not yet implemented for Windows machines: setting to FALSE")
+    parallelize <- FALSE
+  }
+
   if(useNimble) {
     if(is.null(n.burn)) n.burn = n.iter/2
 
@@ -163,12 +168,11 @@ runModel <- function(dataConstants,
 
         # apparent occupancy for this species
         Z <- dataSumm$occMatrix[sp,,]
-        nS <- rowSums(Z>0)
 
+        # write an informative message about this species' data
+        nS <- sum(rowSums(Z>0)>0)
         spName <- dataSumm$stats$species
-
-        # write a helpful message
-        print(paste("Now running", spName[sp], ", which is present on", nS, "sites"))
+        print(paste0("Now running ", spName[sp], ", which is present on ", nS, " sites"))
 
         # add the data for the species of interest
         Cmodel$setData(spDat)
