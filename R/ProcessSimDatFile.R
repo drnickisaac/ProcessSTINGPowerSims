@@ -66,7 +66,8 @@ ProcessSimDatFile <- function(filename,
                               incl2ndTransect = incl2ndTransect)
 
   # if appropriate, limit the number of species
-  formattedData$md$settings$maxSp <- min(maxSp, formattedData$md$settings["sp_modelled"])
+  formattedData$md$settings <- c(formattedData$md$settings,
+                                 maxSp = min(maxSp, formattedData$md$settings["sp_modelled"]))
 
   # SUMMARISE the data
   dataSumm <- with(formattedData, summariseData(obsData, dataConstants))
