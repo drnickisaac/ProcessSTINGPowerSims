@@ -8,9 +8,10 @@
 #' @import nimble
 #' @export
 
-defineModel_SS <- function(inclPhenology = TRUE,
-                           incl2ndTransect = TRUE,
-                           inclPanTrap = TRUE){
+defineModel_SS <- function(incl2ndTransect = TRUE,
+                           inclPanTrap = TRUE,
+                           inclPhenology = TRUE,
+                           scalePheno = TRUE){
 
   modelcode <- nimbleCode({
     ######################### state model
@@ -70,6 +71,12 @@ defineModel_SS <- function(inclPhenology = TRUE,
           f_JD[d] <- 1/((2*3.14159265359)^0.5 * beta2) * exp(-((d - (beta1))^2 / (2* beta2^2)))
           # could simplify this and evaluate only for dates in the dataset
          }
+      if(scalePheno){
+      # rescale the phenology curve so that it has a maximum value of 1
+        phScale <- 1/max(f_JD[1:365])
+        for (d in 1:365){
+          f_JD[d] <- f_JD[d] * phScale
+      }}
       beta1 ~ dunif(50, 300) # peak detectability/activity. Not constrained to fall within the field season (c(100, 250))
       beta2 ~ T(dt(0, 1, 1), 0, 500) # Half Cauchy. Stdev of phenology. At sd=500 the curve is entirely flat
       #phScale ~ T(dt(0, 1, 1), 0, Inf) # Half Cauchy

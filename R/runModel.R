@@ -27,9 +27,10 @@ runModel <- function(dataConstants,
                      obsData,
                      dataSumm,
                      useNimble = TRUE,
-                     inclPhenology = TRUE,
                      inclPanTrap = TRUE,
                      incl2ndTransect = TRUE,
+                     inclPhenology = TRUE,
+                     scalePheno = TRUE,
                      multiSp = TRUE,
                      parallelize = FALSE,
                      allPars = FALSE,
@@ -123,7 +124,8 @@ runModel <- function(dataConstants,
       # step 1 define the model code
       modelcode <- defineModel_SS(inclPhenology = inclPhenology,
                                   inclPanTrap = inclPanTrap,
-                                  incl2ndTransect = incl2ndTransect)
+                                  incl2ndTransect = incl2ndTransect,
+                                  scalePheno = scalePheno)
 
       init.vals <- list(z = dataSumm$occMatrix[1,,], # value for species 1
                         alpha.s = cloglog(dataSumm$stats$naiveOcc)[1], # value for species 1
