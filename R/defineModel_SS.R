@@ -73,10 +73,14 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
          }
       if(scalePheno){
       # rescale the phenology curve so that it has a maximum value of 1
-        log(maxfJD) <- log(0.3989) - log(beta2)
-        for (d in 1:365){
-          fJD[d] <- f_JD[d]/maxfJD
-      }}
+        log(phScale) <- log(0.3989) - log(beta2)
+      } else
+        phScale <- 1
+      # scale the phenocurve
+      for (d in 1:365){
+        fJD[d] <- f_JD[d]/phScale
+      }
+
       beta1 ~ dunif(50, 300) # peak detectability/activity. Not constrained to fall within the field season (c(100, 250))
       beta2 ~ T(dt(0, 1, 1), 0, 200) # Half Cauchy. Stdev of phenology. At sd=500 the curve is entirely flat
       #phScale ~ T(dt(0, 1, 1), 0, Inf) # Half Cauchy
