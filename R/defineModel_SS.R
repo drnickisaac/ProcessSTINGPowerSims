@@ -35,7 +35,7 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
           if(inclPanTrap){
             y1[k] ~ dbin(size = nT[k], prob = Py[k]) # Observed data
             Py[k] <- z[site[k], year[k]] * p1[k]
-            logit(p1[k]) <- alpha.0 + alpha.1 * f_JD[JulDate[k]]
+            logit(p1[k]) <- alpha.0 + alpha.1 * fJD[JulDate[k]]
             #p1[k] <- alpha.p * pThin[k]
           } # Should I add site + year effects to detectability?
 
@@ -46,7 +46,7 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
           }
           #expectCount[k] <- Multiplier * lambda[site[k], year[k]] * pThin[k]
           log(expectCount[k]) <- linPred[site[k], year[k]] * log(p2[k])
-          logit(p2[k]) <- gamma.0 + gamma.1 * f_JD[JulDate[k]]
+          logit(p2[k]) <- gamma.0 + gamma.1 * fJD[JulDate[k]]
 
           #### shared: phenology
           #if(inclPhenology){
@@ -67,22 +67,22 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
 
     ######################### Seasonality shared effect
     if(inclPhenology){
-         for (d in 1:365){
-          f_JD[d] <- 1/((2*3.14159265359)^0.5 * beta2) * exp(-((d - (beta1))^2 / (2* beta2^2)))
+      for (d in 1:365){
+        f_JD[d] <- 1/((2*3.14159265359)^0.5 * beta2) * exp(-((d - (beta1))^2 / (2* beta2^2)))
           # could simplify this and evaluate only for dates in the dataset
          }
       if(scalePheno){
       # rescale the phenology curve so that it has a maximum value of 1
-        phScale <- 1/max(f_JD[1:365])
+        log(maxfJD) <- log(0.3989) - log(beta2)
         for (d in 1:365){
-          f_JD[d] <- f_JD[d] * phScale
+          fJD[d] <- f_JD[d]/maxfJD
       }}
       beta1 ~ dunif(50, 300) # peak detectability/activity. Not constrained to fall within the field season (c(100, 250))
-      beta2 ~ T(dt(0, 1, 1), 0, 500) # Half Cauchy. Stdev of phenology. At sd=500 the curve is entirely flat
+      beta2 ~ T(dt(0, 1, 1), 0, 200) # Half Cauchy. Stdev of phenology. At sd=500 the curve is entirely flat
       #phScale ~ T(dt(0, 1, 1), 0, Inf) # Half Cauchy
       #phScale <- 1/max(f_JD[1:365])
       } else {
-        f_JD[1:365] <- 1/365
+        fJD[1:365] <- 1/365
       }
 
     #########################  derived parameters
