@@ -9,8 +9,9 @@ ProcessSimFolder(
   outPath = "output",
   collateOutput = FALSE,
   useNimble = TRUE,
-  inclPhenology = TRUE,
+  incl2ndTransect = TRUE,
   inclPanTrap = TRUE,
+  inclPhenology = TRUE,
   multiSp = FALSE,
   parallelize = FALSE,
   allPars = FALSE,
@@ -32,9 +33,11 @@ ProcessSimFolder(
 
 \item{useNimble}{option to bypass the model fitting in Nimble (just for testing the code)}
 
-\item{inclPhenology}{should the model account for seasonal variation?}
+\item{incl2ndTransect}{should the model include data from the second transect walk?}
 
 \item{inclPanTrap}{should the model include pan trap data?}
+
+\item{inclPhenology}{should the model account for seasonal variation?}
 
 \item{multiSp}{should the model be run for species separately, or in a multispecies model?}
 

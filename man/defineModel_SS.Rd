@@ -4,7 +4,18 @@
 \alias{defineModel_SS}
 \title{defineModel_SS}
 \usage{
-defineModel_SS(inclPhenology = TRUE, inclPanTrap = TRUE)
+defineModel_SS(
+  incl2ndTransect = TRUE,
+  inclPanTrap = TRUE,
+  inclPhenology = TRUE
+)
+}
+\arguments{
+\item{incl2ndTransect}{should the model include data from the second transect walk?}
+
+\item{inclPanTrap}{should the model include pan trap data?}
+
+\item{inclPhenology}{should the model account for seasonal variation?}
 }
 \value{
 a set of code

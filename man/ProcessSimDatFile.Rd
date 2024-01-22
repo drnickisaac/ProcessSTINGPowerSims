@@ -10,6 +10,7 @@ ProcessSimDatFile(
   outPath = NULL,
   useNimble = TRUE,
   inclPhenology = TRUE,
+  incl2ndTransect = TRUE,
   inclPanTrap = TRUE,
   multiSp = FALSE,
   parallelize = FALSE,
@@ -32,6 +33,8 @@ ProcessSimDatFile(
 \item{useNimble}{option to bypass the model fitting in Nimble (just for testing the code)}
 
 \item{inclPhenology}{should the model account for seasonal variation?}
+
+\item{incl2ndTransect}{should the model include data from the second transect walk?}
 
 \item{inclPanTrap}{should the model include pan trap data?}
 

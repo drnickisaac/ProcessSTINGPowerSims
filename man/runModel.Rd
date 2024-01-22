@@ -9,8 +9,9 @@ runModel(
   obsData,
   dataSumm,
   useNimble = TRUE,
-  inclPhenology = TRUE,
   inclPanTrap = TRUE,
+  incl2ndTransect = TRUE,
+  inclPhenology = TRUE,
   multiSp = TRUE,
   parallelize = FALSE,
   allPars = FALSE,
@@ -28,9 +29,11 @@ runModel(
 
 \item{useNimble}{option to bypass the model fitting in Nimble (just for testing the code)}
 
-\item{inclPhenology}{should the model account for seasonal variation?}
-
 \item{inclPanTrap}{should the model include pan trap data?}
+
+\item{incl2ndTransect}{should the model include data from the second transect walk?}
+
+\item{inclPhenology}{should the model account for seasonal variation?}
 
 \item{multiSp}{should the model be run as a multispecies model, or many single-species models?}
 
