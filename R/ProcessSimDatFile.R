@@ -87,7 +87,7 @@ ProcessSimDatFile <- function(filename,
                        n.burn = n.burn,
                        n.thin = n.thin,
                        n.chain = n.chain,
-                       maxSp = formattedData$md$settings$maxSp)
+                       maxSp = formattedData$md$settings["maxSp"])
 
   #clean up the name of the file. Remove the folder names and file suffix
   name <- gsub(filename, patt = "\\.rds", repl = "")
