@@ -121,26 +121,33 @@ runModel <- function(dataConstants,
 
     } else { # sequential single-species option
       # step 1 define the model code
-      modelcode <- defineModel_SS(inclPhenology = inclPhenology, inclPanTrap = inclPanTrap)
+      modelcode <- defineModel_SS(inclPhenology = inclPhenology,
+                                  inclPanTrap = inclPanTrap,
+                                  incl2ndTransect = incl2ndTransect)
+
+      init.vals <- list(z = dataSumm$occMatrix[1,,], # value for species 1
+                        alpha.s = cloglog(dataSumm$stats$naiveOcc)[1], # value for species 1
+                        gamma.0 = -2,
+                        gamma.1 = 1,
+                        #phScale = 1,
+                        #Multiplier = 1,
+                        #sd.eta = 2,
+                        #eta = rnorm(n=dataConstants$nsite, mean=0, sd=2),
+                        Trend = rnorm(n=1))
+      if(inclPanTrap) {
+        init.vals$alpha.0 <- dataSumm$stats$reportingRate[1] # value for species 1
+        init.vals$alpha.1 <- 1
+      }
+      if(inclPhenology){
+        init.vals$beta1 <- 180
+        init.vals$beta2 <- 50
+      }
 
       # step 2 create an operational from from NIMBLE/BUGS code
       model <- nimbleModel(code = modelcode,
                            constants = dataConstants[!names(dataConstants) %in% "nsp"],
                            data = lapply(obsData, function(x) x[1,]), # values for species 1
-                           inits = list(z = dataSumm$occMatrix[1,,], # value for species 1
-                                        alpha.s = cloglog(dataSumm$stats$naiveOcc)[1], # value for species 1
-                                        alpha.0 = dataSumm$stats$reportingRate[1], # value for species 1
-                                        alpha.1 = 1,
-                                        gamma.0 = -2,
-                                        gamma.1 = 1,
-                                        beta1 = 180,
-                                        beta2 = 50,
-                                        #phScale = 1,
-                                        #Multiplier = 1,
-                                        #sd.eta = 2,
-                                        #eta = rnorm(n=dataConstants$nsite, mean=0, sd=2),
-                                        Trend = rnorm(n=1))
-                           )
+                           inits = init.vals)
 
       # step 3 build an MCMC object using buildMCMC(). we can add some customization here
       params <- c("mu.lambda","Trend")
@@ -178,10 +185,10 @@ runModel <- function(dataConstants,
         Cmodel$setData(spDat)
 
         # finish initialization
-        Cmodel$setInits(list(z = Z,
-                             alpha.s = cloglog(dataSumm$stats$naiveOcc)[sp],
-                             alpha.0 = dataSumm$stats$reportingRate[sp] # replace with reportingRate_1 when I can calculate it
-        ))
+        spInits <- list(z = Z,
+                        alpha.s = cloglog(dataSumm$stats$naiveOcc)[sp])
+        if(inclPanTrap) spInits$alpha.0 = dataSumm$stats$reportingRate[sp] # replace with reportingRate_1 when I can calculate it
+        Cmodel$setInits(spInits)
 
         # test whether the model is fully initialised
         if(is.na(Cmodel$calculate())) {stop("model not fully initialized")}
