@@ -1,9 +1,10 @@
 #' formatData
 #'
 #' @details Formats data ready for Nimble
-#'
-#' @param inData A dataset produced by the simulations
 #' @param minSite the threshold minimum number of sites for a species to be considered for modelling
+#' @param inData A dataset produced by the simulations
+#' @param inclPanTrap should the model include pan trap data?
+#' @param incl2ndTransect should the model include data from the second transect walk?
 #' @return list of two data frames
 #' @import reshape2
 #' @export
@@ -35,7 +36,7 @@ formatData <- function(inData,
 
   # create metadata object
   md <- formatMetadata(inData)
-  md$datastr$sp_n_Site <- as.data.frame(sp_n_Site)
+  md$datastr$sp_n_Site <- data.frame(species = names(sp_n_Site), sp_n_Site = as.numeric(sp_n_Site))
   md$settings <- c(sp_modelled = length(sp2incl),
                    minSite = minSite,
                   #inclPhenology = inclPhenology,
