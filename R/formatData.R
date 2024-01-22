@@ -65,9 +65,9 @@ formatData <- function(inData,
   obsData$y2 = t(trCount1)[sp2incl,]
 
   if(incl2ndTransect) {
-    obsData$y3 = t(trCount2)[sp2incl,]
     trCount2 <- acast(inData, year + round + siteID ~ species,
                       value.var = "obs_transect2", fill=0)
+    obsData$y3 <- t(trCount2)[sp2incl,]
   }
 
   return(list(dataConstants = dataConstants,
