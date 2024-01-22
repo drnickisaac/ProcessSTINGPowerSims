@@ -40,10 +40,10 @@ formatData <- function(inData,
                    inclPanTrap = inclPanTrap,
                    inclPhenology = inclPhenology)
 
-  dataConstants <- list(nsp = md$sp_modelled,
-                        nsite = md$sites,
+  dataConstants <- list(nsp = md$settings$sp_modelled,
+                        nsite = md$simpars$sites,
                         nvisit = nrow(castDat),
-                        nyear = md$years,
+                        nyear = md$simpars$years,
                         year = castDat$year,
                         site = as.numeric(gsub(castDat$siteID, patt="site_", repl="")),
                         JulDate = castDat$jday,
