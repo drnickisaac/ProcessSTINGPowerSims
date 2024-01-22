@@ -37,7 +37,7 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
             if(inclPhenology){
               logit(p1[k]) <- alpha.0 - alpha.1 * (f_JD[JulDate[k]] - max(f_JD[1:365]))
             } else {
-              logit(p2[k]) <- alpha.0
+              logit(p1[k]) <- alpha.0
             }
             #p1[k] <- alpha.p * pThin[k]
           } # Should I add site + year effects to detectability?
@@ -65,14 +65,15 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
     ######################### Obs model priors
     if(inclPanTrap){
       alpha.0 ~ dnorm(-2, tau = 0.0001) # logit detection probability per pan trap at peak phenology (or mean across year).
-      alpha.1 ~ T(dt(0, 1, 1), 0, Inf) # scaling parameter for detection on pan trap
+      if(inclPhenology){alpha.1 ~ T(dt(0, 1, 1), 0, Inf)} # scaling parameter for detection on pan trap
     }
     gamma.0 ~ dnorm(-2, tau = 0.0001) # detection probability GLM on transects at peak phenology
     gamma.1 ~ T(dt(0, 1, 1), 0, Inf) # scaling factor for detection on transects with seasonality
 
-    beta1 ~ dunif(50, 300) # peak detectability/activity. Not constrained to fall within the field season (c(100, 250))
-    beta2 ~ T(dt(0, 1, 1), 0, 200) # Half Cauchy. Stdev of phenology. At sd=500 the curve is entirely flat
-
+    if(inclPhenology){
+      beta1 ~ dunif(50, 300) # peak detectability/activity. Not constrained to fall within the field season (c(100, 250))
+      beta2 ~ T(dt(0, 1, 1), 10, 200) # Half Cauchy. Stdev of phenology. At sd=500 the curve is entirely flat
+    }
     #########################  derived parameters
     for(t in 1:nyear){
       #psi.fs[t] <- mean(z[1:nsite],t)

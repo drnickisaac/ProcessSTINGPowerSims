@@ -150,7 +150,7 @@ runModel <- function(dataConstants,
       params <- c("mu.lambda","Trend")
       if(allPars) {
         params <- c(params, 'alpha.s','gamma.0')
-        if(inclPanTrap) params <- c(params,'alpha.1')
+        if(inclPanTrap) params <- c(params,'alpha.0')
         if(inclPanTrap & inclPhenology) params <- c(params, 'alpha.1')
         if(inclPhenology) params <- c(params, "beta1", "beta2", 'gamma.1')
       }
