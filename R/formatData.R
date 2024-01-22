@@ -32,7 +32,7 @@ formatData <- function(inData, minSite = 1){
   # create metadata object
   md <- formatMetadata(inData)
   md$sp_modelled <- length(sp2incl)
-  md$sp_n_Site <- sp_n_site
+  md$sp_n_Site <- sp_n_Site
   md$minSite <- minSite
 
   dataConstants <- list(nsp = md$sp_modelled,
