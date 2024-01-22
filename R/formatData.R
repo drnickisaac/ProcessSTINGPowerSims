@@ -40,7 +40,7 @@ formatData <- function(inData,
                    inclPanTrap = inclPanTrap,
                    inclPhenology = inclPhenology)
 
-  dataConstants <- list(nsp = md$settings$sp_modelled,
+  dataConstants <- list(nsp = md$settings["sp_modelled"],
                         nsite = md$simpars$sites,
                         nvisit = nrow(castDat),
                         nyear = md$simpars$years,
