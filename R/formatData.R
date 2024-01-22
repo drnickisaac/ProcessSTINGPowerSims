@@ -13,8 +13,6 @@ formatData <- function(inData, minSite = 1){
   castDat <- dcast(inData, year + round + siteID + jday + total_pantraps ~ "nsp",
                    value.var = "abundance", fun = length, fill = 0)
 
-  md <- formatMetadata(inData)
-
   # set the minimum number of sites, as there are some species that were never observed.
   if(minSite < 1) minSite <- 1
 
@@ -30,8 +28,11 @@ formatData <- function(inData, minSite = 1){
   nExcl <- length(sp_n_Site) - length(sp2incl)
   print(paste('Note:',nExcl,'species out of', length(sp_n_Site), 'have been excluded because they occur on fewer than', minSite, 'sites'))
   print(paste('We proceed to modelling with', length(sp2incl), 'species'))
-  md$sp_modelled <- length(sp2incl)
 
+  # create metadata object
+  md <- formatMetadata(inData)
+  md$sp_modelled <- length(sp2incl)
+  md$sp_n_Site <- sp_n_site
   md$minSite <- minSite
 
   dataConstants <- list(nsp = md$sp_modelled,
