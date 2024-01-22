@@ -34,7 +34,7 @@ formatData <- function(inData,
 
   # create metadata object
   md <- formatMetadata(inData)
-  md$datastr$sp_n_Site <- sp_n_Site
+  md$datastr$sp_n_Site <- as.data.frame(sp_n_Site)
   md$settings <- c(sp_modelled = length(sp2incl),
                    minSite = minSite,
                    inclPanTrap = inclPanTrap,
