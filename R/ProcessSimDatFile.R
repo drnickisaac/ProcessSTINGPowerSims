@@ -66,7 +66,7 @@ ProcessSimDatFile <- function(filename,
                               incl2ndTransect = incl2ndTransect)
 
   # if appropriate, limit the number of species
-  formattedData$md$settings$maxSp <- min(maxSp, formattedData$md$sp_modelled)
+  formattedData$md$settings$maxSp <- min(maxSp, formattedData$md$settings["sp_modelled"])
 
   # SUMMARISE the data
   dataSumm <- with(formattedData, summariseData(obsData, dataConstants))
@@ -86,7 +86,7 @@ ProcessSimDatFile <- function(filename,
                        n.burn = n.burn,
                        n.thin = n.thin,
                        n.chain = n.chain,
-                       maxSp = formattedData$md$maxSp)
+                       maxSp = formattedData$md$settings$maxSp)
 
   #clean up the name of the file. Remove the folder names and file suffix
   name <- gsub(filename, patt = "\\.rds", repl = "")
