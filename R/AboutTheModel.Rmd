@@ -27,6 +27,7 @@ library(nimble)
 Define the model code in Nimble
 ```{r defineModel}
 defineModel_SS <- function(inclPhenology = TRUE,
+                           
                         inclPanTrap = TRUE){
 
   modelcode <- nimbleCode({

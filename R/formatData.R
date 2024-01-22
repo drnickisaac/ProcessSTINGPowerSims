@@ -10,7 +10,8 @@
 
 formatData <- function(inData,
                        minSite = 1,
-                       inclPhenology = TRUE,
+                       #inclPhenology = TRUE,
+                       incl2ndTransect = TRUE,
                        inclPanTrap = TRUE){
 
   castDat <- dcast(inData, year + round + siteID + jday + total_pantraps ~ "nsp",
@@ -37,8 +38,9 @@ formatData <- function(inData,
   md$datastr$sp_n_Site <- as.data.frame(sp_n_Site)
   md$settings <- c(sp_modelled = length(sp2incl),
                    minSite = minSite,
+                  #inclPhenology = inclPhenology,
                    inclPanTrap = inclPanTrap,
-                   inclPhenology = inclPhenology)
+                   incl2ndTransect = incl2ndTransect)
 
   dataConstants <- list(nsp = md$settings["sp_modelled"],
                         nsite = md$simpars$sites,
@@ -49,18 +51,24 @@ formatData <- function(inData,
                         JulDate = castDat$jday,
                         nT = castDat$total_pantraps)
 
-  # extract the observations
-  ObsPan <- acast(inData, year + round + siteID ~ species,
-                  value.var = "presences_pan", fill = 0)
+  # extract the observations and populate the obsData list
+  obsData <- list()
+
+  if(inclPanTrap) {
+    ObsPan <- acast(inData, year + round + siteID ~ species,
+                    value.var = "presences_pan", fill = 0)
+    obsData$y1 <- t(ObsPan)[sp2incl,]
+  }
+
   trCount1 <- acast(inData, year + round + siteID ~ species,
                     value.var = "obs_transect1", fill=0)
-  trCount2 <- acast(inData, year + round + siteID ~ species,
-                    value.var = "obs_transect2", fill=0) # not quite sure why, but this turns NAs into 0s
+  obsData$y2 = t(trCount1)[sp2incl,]
 
-  # observations have to be transposed because we have coded species as the first dimension
-  obsData <- list(y1 = t(ObsPan)[sp2incl,],
-                  y2 = t(trCount1)[sp2incl,],
-                  y3 = t(trCount2)[sp2incl,])
+  if(incl2ndTransect) {
+    obsData$y3 = t(trCount2)[sp2incl,]
+    trCount2 <- acast(inData, year + round + siteID ~ species,
+                      value.var = "obs_transect2", fill=0)
+  }
 
   return(list(dataConstants = dataConstants,
               obsData = obsData,

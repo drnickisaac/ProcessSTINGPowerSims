@@ -9,6 +9,7 @@
 #' @param useNimble option to bypass the model fitting in Nimble (just for testing the code)
 #' @param inclPhenology should the model account for seasonal variation?
 #' @param inclPanTrap should the model include pan trap data?
+#' @param incl2ndTransect should the model include data from the second transect walk?
 #' @param multiSp should the model be run for each species separately, or in a single model?
 #' @param parallelize option to parallelize across MCMC chains
 #' @param allPars if `TRUE` then all model parameters are monitored. If `FALSE`, just `mu.lambda` and `Trend`.
@@ -27,6 +28,7 @@ ProcessSimDatFile <- function(filename,
                               outPath = NULL,
                               useNimble = TRUE,
                               inclPhenology = TRUE,
+                              incl2ndTransect = TRUE,
                               inclPanTrap = TRUE,
                               multiSp = FALSE,
                               parallelize = FALSE,
@@ -57,7 +59,11 @@ ProcessSimDatFile <- function(filename,
   print(paste("Successfully read in", filename))
 
   # format the data (includes removing species found on few sites)
-  formattedData <- formatData(indata, minSite = minSite, inclPanTrap = inclPanTrap, inclPhenology = inclPhenology)
+  formattedData <- formatData(indata,
+                              minSite = minSite,
+                              #inclPhenology = inclPhenology,
+                              inclPanTrap = inclPanTrap,
+                              incl2ndTransect = incl2ndTransect)
 
   # if appropriate, limit the number of species
   formattedData$md$settings$maxSp <- min(maxSp, formattedData$md$sp_modelled)
@@ -70,6 +76,9 @@ ProcessSimDatFile <- function(filename,
                        formattedData$obsData,
                        dataSumm = dataSumm,
                        useNimble = useNimble,
+                       inclPanTrap = inclPanTrap,
+                       incl2ndTransect = incl2ndTransect,
+                       inclPhenology = inclPhenology,
                        multiSp = multiSp,
                        parallelize = parallelize,
                        allPars = allPars,
@@ -93,13 +102,14 @@ ProcessSimDatFile <- function(filename,
                  dataSummStats = dataSumm$stats,
                  modelEff = modelEff,
                  runSettings = c(inclPhenology = inclPhenology,
-                                   inclPanTrap = inclPanTrap,
-                                   multiSp = multiSp,
-                                   parallelize = parallelize,
-                                   n.iter = n.iter,
-                                   n.burn = n.burn,
-                                   n.thin = n.thin,
-                                   n.chain = n.chain),
+                                 incl2ndTransect = incl2ndTransect,
+                                 inclPanTrap = inclPanTrap,
+                                 multiSp = multiSp,
+                                 parallelize = parallelize,
+                                 n.iter = n.iter,
+                                 n.burn = n.burn,
+                                 n.thin = n.thin,
+                                 n.chain = n.chain),
                 Version = packageVersion("ProcessSTINGPowerSims"),
                 timestamp  = format(Sys.time(), "%y-%m-%d %H:%M:%S"))
 

@@ -8,8 +8,9 @@
 #' @param outPath location of folder to store results
 #' @param collateOutput should the output be stored for collation all together (`TRUE`) or written as separate files (`FALSE`)
 #' @param useNimble option to bypass the model fitting in Nimble (just for testing the code)
-#' @param inclPhenology should the model account for seasonal variation?
 #' @param inclPanTrap should the model include pan trap data?
+#' @param incl2ndTransect should the model include data from the second transect walk?
+#' @param inclPhenology should the model account for seasonal variation?
 #' @param multiSp should the model be run for species separately, or in a multispecies model?
 #' @param parallelize option to parallelize across MCMC chains
 #' @param allPars if `TRUE` then all model parameters are monitored. If `FALSE`, just `mu.lambda` and `Trend`.
@@ -29,6 +30,7 @@ ProcessSimFolder <- function(inPath = ".",
                             collateOutput = FALSE,
                             useNimble = TRUE,
                             inclPhenology = TRUE,
+                            incl2ndTransect = TRUE,
                             inclPanTrap = TRUE,
                             multiSp = FALSE,
                             parallelize = FALSE,
@@ -65,8 +67,9 @@ ProcessSimFolder <- function(inPath = ".",
                    inPath = inPath,
                    outPath = ifelse(collateOutput, NULL, outPath),
                    useNimble = useNimble,
-                   inclPhenology = inclPhenology,
                    inclPanTrap = inclPanTrap,
+                   incl2ndTransect = incl2ndTransect,
+                   inclPhenology = inclPhenology,
                    parallelize = parallelize,
                    allPars = allPars,
                    n.iter = n.iter,

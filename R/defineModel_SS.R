@@ -1,12 +1,16 @@
 #' defineModel_SS
 #'
 #' @details Defines the Nimble model for one species.
+#' @param inclPhenology should the model account for seasonal variation?
+#' @param inclPanTrap should the model include pan trap data?
+#' @param incl2ndTransect should the model include data from the second transect walk?
 #' @return a set of code
 #' @import nimble
 #' @export
 
 defineModel_SS <- function(inclPhenology = TRUE,
-                        inclPanTrap = TRUE){
+                           incl2ndTransect = TRUE,
+                           inclPanTrap = TRUE){
 
   modelcode <- nimbleCode({
     ######################### state model
@@ -36,7 +40,9 @@ defineModel_SS <- function(inclPhenology = TRUE,
 
           ##### transects
           y2[k] ~ dpois(expectCount[k]) # Observed counts. Might need a NegBin here or Zero-inflated
-          y3[k] ~ dpois(expectCount[k]) # Observed counts. Might need a NegBin here or Zero-inflated
+          if(incl2ndTransect){
+            y3[k] ~ dpois(expectCount[k]) # Observed counts. Might need a NegBin here or Zero-inflated
+          }
           #expectCount[k] <- Multiplier * lambda[site[k], year[k]] * pThin[k]
           log(expectCount[k]) <- linPred[site[k], year[k]] * log(p2[k])
           logit(p2[k]) <- gamma.0 + gamma.1 * f_JD[JulDate[k]]

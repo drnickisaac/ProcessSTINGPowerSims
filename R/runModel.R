@@ -5,8 +5,9 @@
 #' @param obsData dataframe produced by ProcessSimDatFile()
 #' @param dataSumm$stats dataframe produced by ProcessSimDatFile()
 #' @param useNimble option to bypass the model fitting in Nimble (just for testing the code)
-#' @param inclPhenology should the model account for seasonal variation?
 #' @param inclPanTrap should the model include pan trap data?
+#' @param incl2ndTransect should the model include data from the second transect walk?
+#' @param inclPhenology should the model account for seasonal variation?
 #' @param multiSp should the model be run as a multispecies model, or many single-species models?
 #' @param parallelize should the chains be run as separate processes on different cores?
 #' @param allPars if `TRUE` then all model parameters are monitored. If `FALSE`, just `mu.lambda` and `Trend`.
@@ -28,6 +29,7 @@ runModel <- function(dataConstants,
                      useNimble = TRUE,
                      inclPhenology = TRUE,
                      inclPanTrap = TRUE,
+                     incl2ndTransect = TRUE,
                      multiSp = TRUE,
                      parallelize = FALSE,
                      allPars = FALSE,
@@ -52,7 +54,7 @@ runModel <- function(dataConstants,
     if(maxSp < 2) maxSp <- 2
 
     # truncate the dataset if there are too many species
-    if(dim(obsData$y1)[1] > maxSp){
+    if(dim(obsData$y2)[1] > maxSp){
       obsData <- lapply(obsData, function(x) x[1:maxSp,])
       dataSumm$occMatrix <- dataSumm$occMatrix[1:maxSp,,]
       dataSumm$stats <- dataSumm$stats[1:maxSp,]
@@ -142,13 +144,11 @@ runModel <- function(dataConstants,
 
       # step 3 build an MCMC object using buildMCMC(). we can add some customization here
       params <- c("mu.lambda","Trend")
-      if(allPars) params <- c(params,
-                              'alpha.s',
-                              'alpha.0','alpha.1',
-                              'gamma.0','gamma.1',
-                              #"sd.eta"
-                              #"phScale","Multiplier","alpha.p"
-                              "beta1", "beta2")
+      if(allPars) params <- c(params, 'alpha.s',
+                              #"sd.eta","phScale","Multiplier","alpha.p"
+                              'gamma.0','gamma.1')
+      if(inclPanTrap) params <- c(params, 'alpha.0','alpha.1')
+      if(inclPhenology) params <- c(params, "beta1", "beta2")
 
       occMCMC <- buildMCMC(model,
                            monitors = params,
@@ -205,7 +205,7 @@ runModel <- function(dataConstants,
       ####### run the model for each species
 
       if(parallelize){
-        av_cores <- parallel::detectCores() - 1
+        #av_cores <- parallel::detectCores() - 1
         yearEff <- pbmcapply::pbmclapply(1:maxSp, function(i){
           single_species_model(sp=i,
                                spDat=lapply(obsData, function(x) x[i,]),
@@ -216,7 +216,7 @@ runModel <- function(dataConstants,
                                n.chain = n.chain,
                                Cmodel, CoccMCMC)
         },
-        mc.cores = av_cores
+        mc.cores = getOption("mc.cores", 7L)  #av_cores
         )
       } else {
         yearEff <- lapply(1:maxSp, function(i){
@@ -232,6 +232,7 @@ runModel <- function(dataConstants,
         )
       }
       names(yearEff) <- dimnames(dataSumm$occMatrix)[[1]][1:maxSp]
+      attr(yearEff, "modelCode") <- model$getCode()
     }
 
     #####################################################################
