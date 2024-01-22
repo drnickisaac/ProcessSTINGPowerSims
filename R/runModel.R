@@ -128,7 +128,7 @@ runModel <- function(dataConstants,
 
       init.vals <- list(z = dataSumm$occMatrix[1,,], # value for species 1
                         alpha.s = cloglog(dataSumm$stats$naiveOcc)[1], # value for species 1
-                        gamma.0 = boot:inv.logit(0.2),
+                        gamma.0 = boot::inv.logit(0.2),
                         Trend = rnorm(n=1))
       if(inclPanTrap) {
         init.vals$alpha.0 <- boot::inv.logit(dataSumm$stats$reportingRate[1]) # value for species 1
