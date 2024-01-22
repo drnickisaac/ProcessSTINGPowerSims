@@ -8,7 +8,10 @@
 #' @import reshape2
 #' @export
 
-formatData <- function(inData, minSite = 1){
+formatData <- function(inData,
+                       minSite = 1,
+                       inclPhenology = TRUE,
+                       inclPanTrap = TRUE){
 
   castDat <- dcast(inData, year + round + siteID + jday + total_pantraps ~ "nsp",
                    value.var = "abundance", fun = length, fill = 0)
@@ -31,9 +34,11 @@ formatData <- function(inData, minSite = 1){
 
   # create metadata object
   md <- formatMetadata(inData)
-  md$sp_modelled <- length(sp2incl)
-  md$sp_n_Site <- sp_n_Site
-  md$minSite <- minSite
+  md$datastr$sp_n_Site <- sp_n_Site
+  md$settings <- c(sp_modelled = length(sp2incl),
+                   minSite = minSite,
+                   inclPanTrap = inclPanTrap,
+                   inclPhenology = inclPhenology)
 
   dataConstants <- list(nsp = md$sp_modelled,
                         nsite = md$sites,
