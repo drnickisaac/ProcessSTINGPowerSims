@@ -19,7 +19,7 @@ summariseData <- function(obsData, dataConstants){
     mutate(value = value>0) %>%
     group_by(site, year, variable) %>%
     summarise(occ = max(value))
-  occMatrix <- acast(as.data.frame(temp), variable ~ site ~ year, value.var = "occ")
+  occMatrix <- acast(as.data.frame(temp), variable ~ site ~ year, value.var = "occ", fill = 0)
 
   occSpSite <- apply(occMatrix,c(1,2),max)
 

@@ -39,7 +39,7 @@ runModel <- function(dataConstants,
 
   ###################################################################
 
-  if(grepl("x86", sessionInfo()$platform) & parallelize == TRUE){
+  if(grepl("mingw32", sessionInfo()$platform) & parallelize == TRUE){
     warning("Parallelization not yet implemented for Windows machines: setting to FALSE")
     parallelize <- FALSE
   }
@@ -170,7 +170,7 @@ runModel <- function(dataConstants,
         Z <- dataSumm$occMatrix[sp,,]
 
         # write an informative message about this species' data
-        nS <- sum(rowSums(Z>0)>0)
+        nS <- sum(rowSums(Z>0, na.rm=T)>0)
         spName <- dataSumm$stats$species
         print(paste0("Now running ", spName[sp], ", which is present on ", nS, " sites"))
 
