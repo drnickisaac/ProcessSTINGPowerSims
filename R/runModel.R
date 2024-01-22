@@ -22,6 +22,7 @@
 #' @import pbmcapply
 #' @import parallel
 #' @import coda
+#' @import boot
 
 runModel <- function(dataConstants,
                      obsData,
@@ -30,7 +31,6 @@ runModel <- function(dataConstants,
                      inclPanTrap = TRUE,
                      incl2ndTransect = TRUE,
                      inclPhenology = TRUE,
-                     scalePheno = TRUE,
                      multiSp = TRUE,
                      parallelize = FALSE,
                      allPars = FALSE,
@@ -124,25 +124,20 @@ runModel <- function(dataConstants,
       # step 1 define the model code
       modelcode <- defineModel_SS(inclPhenology = inclPhenology,
                                   inclPanTrap = inclPanTrap,
-                                  incl2ndTransect = incl2ndTransect,
-                                  scalePheno = scalePheno)
+                                  incl2ndTransect = incl2ndTransect)
 
       init.vals <- list(z = dataSumm$occMatrix[1,,], # value for species 1
                         alpha.s = cloglog(dataSumm$stats$naiveOcc)[1], # value for species 1
-                        gamma.0 = -2,
-                        gamma.1 = 1,
-                        #phScale = 1,
-                        #Multiplier = 1,
-                        #sd.eta = 2,
-                        #eta = rnorm(n=dataConstants$nsite, mean=0, sd=2),
+                        gamma.0 = boot:inv.logit(0.2),
                         Trend = rnorm(n=1))
       if(inclPanTrap) {
-        init.vals$alpha.0 <- dataSumm$stats$reportingRate[1] # value for species 1
-        init.vals$alpha.1 <- 1
+        init.vals$alpha.0 <- boot::inv.logit(dataSumm$stats$reportingRate[1]) # value for species 1
+        if(inclPhenology) init.vals$alpha.1 <- 1
       }
       if(inclPhenology){
         init.vals$beta1 <- 180
         init.vals$beta2 <- 50
+        init.vals$gamma.1 <- 1
       }
 
       # step 2 create an operational from from NIMBLE/BUGS code
@@ -153,11 +148,12 @@ runModel <- function(dataConstants,
 
       # step 3 build an MCMC object using buildMCMC(). we can add some customization here
       params <- c("mu.lambda","Trend")
-      if(allPars) params <- c(params, 'alpha.s',
-                              #"sd.eta","phScale","Multiplier","alpha.p"
-                              'gamma.0','gamma.1')
-      if(inclPanTrap) params <- c(params, 'alpha.0','alpha.1')
-      if(inclPhenology) params <- c(params, "beta1", "beta2")
+      if(allPars) {
+        params <- c(params, 'alpha.s','gamma.0')
+        if(inclPanTrap) params <- c(params,'alpha.1')
+        if(inclPanTrap & inclPhenology) params <- c(params, 'alpha.1')
+        if(inclPhenology) params <- c(params, "beta1", "beta2", 'gamma.1')
+      }
 
       occMCMC <- buildMCMC(model,
                            monitors = params,
@@ -189,7 +185,7 @@ runModel <- function(dataConstants,
         # finish initialization
         spInits <- list(z = Z,
                         alpha.s = cloglog(dataSumm$stats$naiveOcc)[sp])
-        if(inclPanTrap) spInits$alpha.0 = dataSumm$stats$reportingRate[sp] # replace with reportingRate_1 when I can calculate it
+        if(inclPanTrap) spInits$alpha.0 = boot::inv.logit(dataSumm$stats$reportingRate[sp]) # replace with reportingRate_1 when I can calculate it
         Cmodel$setInits(spInits)
 
         # test whether the model is fully initialised

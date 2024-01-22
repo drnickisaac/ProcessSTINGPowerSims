@@ -10,8 +10,7 @@
 
 defineModel_SS <- function(incl2ndTransect = TRUE,
                            inclPanTrap = TRUE,
-                           inclPhenology = TRUE,
-                           scalePheno = TRUE){
+                           inclPhenology = TRUE){
 
   modelcode <- nimbleCode({
     ######################### state model
@@ -35,7 +34,11 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
           if(inclPanTrap){
             y1[k] ~ dbin(size = nT[k], prob = Py[k]) # Observed data
             Py[k] <- z[site[k], year[k]] * p1[k]
-            logit(p1[k]) <- alpha.0 + alpha.1 * fJD[JulDate[k]]
+            if(inclPhenology){
+              logit(p1[k]) <- alpha.0 - alpha.1 * (fJD[JulDate[k]] - max(f_JD[1:365]))
+            } else {
+              logit(p2[k]) <- alpha.0
+            }
             #p1[k] <- alpha.p * pThin[k]
           } # Should I add site + year effects to detectability?
 
@@ -46,48 +49,29 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
           }
           #expectCount[k] <- Multiplier * lambda[site[k], year[k]] * pThin[k]
           log(expectCount[k]) <- linPred[site[k], year[k]] * log(p2[k])
-          logit(p2[k]) <- gamma.0 + gamma.1 * fJD[JulDate[k]]
-
-          #### shared: phenology
-          #if(inclPhenology){
-          #  logit(pThin[k]) <- phScale * f_JD[JulDate[k]] # assuming no site effect here
-          #} else {
-          #  pThin[k] <- 1
-          #}
+          if(inclPhenology){
+            logit(p2[k]) <- gamma.0 - gamma.1 * (fJD[JulDate[k]] - max(f_JD[1:365]))
+          } else {
+            logit(p2[k]) <- gamma.0
+          }
     }
-
-    ######################### Obs model priors
-    if(inclPanTrap){
-      alpha.0 ~ dnorm(-2, tau = 0.0001) # logit detection probability per pan trap at peak phenology.
-      alpha.1 ~ T(dt(0, 1, 1), 0, Inf) # scaling parameter for detection on pan trap
-    }
-    gamma.0 ~ dnorm(-2, tau = 0.0001) # intercept of detection probability GLM on transects
-    gamma.1 ~ T(dt(0, 1, 1), 0, Inf) # slope of detection probability GLM on transects
-    #Multiplier ~ T(dt(0, 1, 1), 0, Inf) # expected count per unit of lambda
 
     ######################### Seasonality shared effect
     if(inclPhenology){
       for (d in 1:365){
         f_JD[d] <- 1/((2*3.14159265359)^0.5 * beta2) * exp(-((d - (beta1))^2 / (2* beta2^2)))
-          # could simplify this and evaluate only for dates in the dataset
-         }
-      if(scalePheno){
-      # rescale the phenology curve so that it has a maximum value of 1
-        log(phScale) <- log(0.3989) - log(beta2)
-      } else
-        phScale <- 1
-      # scale the phenocurve
-      for (d in 1:365){
-        fJD[d] <- f_JD[d]/phScale
       }
+    }
+    ######################### Obs model priors
+    if(inclPanTrap){
+      alpha.0 ~ dnorm(-2, tau = 0.0001) # logit detection probability per pan trap at peak phenology (or mean across year).
+      alpha.1 ~ T(dt(0, 1, 1), 0, Inf) # scaling parameter for detection on pan trap
+    }
+    gamma.0 ~ dnorm(-2, tau = 0.0001) # detection probability GLM on transects at peak phenology
+    gamma.1 ~ T(dt(0, 1, 1), 0, Inf) # scaling factor for detection on transects with seasonality
 
-      beta1 ~ dunif(50, 300) # peak detectability/activity. Not constrained to fall within the field season (c(100, 250))
-      beta2 ~ T(dt(0, 1, 1), 0, 200) # Half Cauchy. Stdev of phenology. At sd=500 the curve is entirely flat
-      #phScale ~ T(dt(0, 1, 1), 0, Inf) # Half Cauchy
-      #phScale <- 1/max(f_JD[1:365])
-      } else {
-        fJD[1:365] <- 1/365
-      }
+    beta1 ~ dunif(50, 300) # peak detectability/activity. Not constrained to fall within the field season (c(100, 250))
+    beta2 ~ T(dt(0, 1, 1), 0, 200) # Half Cauchy. Stdev of phenology. At sd=500 the curve is entirely flat
 
     #########################  derived parameters
     for(t in 1:nyear){

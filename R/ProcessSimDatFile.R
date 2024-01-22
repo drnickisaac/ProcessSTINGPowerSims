@@ -10,7 +10,6 @@
 #' @param inclPanTrap should the model include pan trap data?
 #' @param incl2ndTransect should the model include data from the second transect walk?
 #' @param inclPhenology should the model account for seasonal variation?
-#' @param scalePheno should the phenology be calculated at seasonal maximum?
 #' @param multiSp should the model be run for each species separately, or in a single model?
 #' @param parallelize option to parallelize across MCMC chains
 #' @param allPars if `TRUE` then all model parameters are monitored. If `FALSE`, just `mu.lambda` and `Trend`.
@@ -31,7 +30,6 @@ ProcessSimDatFile <- function(filename,
                               inclPhenology = TRUE,
                               incl2ndTransect = TRUE,
                               inclPanTrap = TRUE,
-                              scalePheno = TRUE,
                               multiSp = FALSE,
                               parallelize = FALSE,
                               allPars = FALSE,
@@ -81,7 +79,6 @@ ProcessSimDatFile <- function(filename,
                        inclPanTrap = inclPanTrap,
                        incl2ndTransect = incl2ndTransect,
                        inclPhenology = inclPhenology,
-                       scalePheno = scalePheno,
                        multiSp = multiSp,
                        parallelize = parallelize,
                        allPars = allPars,
