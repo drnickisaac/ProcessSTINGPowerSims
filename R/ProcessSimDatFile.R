@@ -110,6 +110,7 @@ ProcessSimDatFile <- function(filename,
                                  n.burn = n.burn,
                                  n.thin = n.thin,
                                  n.chain = n.chain),
+                spDat = sapply(formattedData$obsData, function(x) rowSums(x>0)),
                 Version = packageVersion("ProcessSTINGPowerSims"),
                 timestamp  = format(Sys.time(), "%y-%m-%d %H:%M:%S"))
 

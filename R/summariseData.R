@@ -8,7 +8,9 @@
 #' @import reshape2
 #' @export
 
-summariseData <- function(obsData, dataConstants){
+summariseData <- function(obsData, dataConstants,
+                          inclPanTrap = TRUE,
+                          incl2ndTransect = TRUE){
 
   # calculate for each visit whether the species was observed across 1-3 data types (depending on what exists)
   obs <- obsData$y2
@@ -26,7 +28,10 @@ summariseData <- function(obsData, dataConstants){
   occSpSite <- apply(occMatrix,c(1,2),max)
 
   # Mean transect count: for calculating stats
-  trMean_1 <- trMean <- (obsData$y2 + obsData$y3)/2
+  if(!is.null(obsData$y3))
+    trMean_1 <- trMean <- obsData$y2
+  else
+    trMean_1 <- trMean <- (obsData$y2 + obsData$y3)/2
   trMean_1[trMean_1 == 0] <- NA
 
   stats <- data.frame(
