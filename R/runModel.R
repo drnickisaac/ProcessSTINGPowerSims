@@ -10,7 +10,7 @@
 #' @param inclPhenology should the model account for seasonal variation?
 #' @param multiSp should the model be run as a multispecies model, or many single-species models?
 #' @param parallelize should the chains be run as separate processes on different cores?
-#' @param allPars if `TRUE` then all model parameters are monitored. If `FALSE`, just `mu.lambda` and `Trend`.
+#' @param allPars if `TRUE` then all model parameters are monitored. If `FALSE`, just `lam.0bda` and `Trend`.
 #' @param n.iter number of iterations for the Nimble model. Default is 1000.
 #' @param n.burn number of iterations for the burn-in. If `NULL` (the default), then it will be set to `n.iter/2`.
 #' @param n.thin thinning for the MCMC chains. Defaults to 5
@@ -75,7 +75,7 @@ runModel <- function(dataConstants,
                            constants = dataConstants,
                            data = obsData,
                            inits = list(z = dataSumm$occMatrix,
-                                        alpha.s = cloglog(dataSumm$stats$naiveOcc),
+                                        lam.0 = cloglog(dataSumm$stats$naiveOcc),
                                         alpha.p = dataSumm$stats$reportingRate, # replace with reportingRate_1 when I can calculate it
                                         beta1 = rep(180, dataConstants$nsp),
                                         beta2 = rep(50, dataConstants$nsp),
@@ -127,7 +127,7 @@ runModel <- function(dataConstants,
                                   incl2ndTransect = incl2ndTransect)
 
       init.vals <- list(z = dataSumm$occMatrix[1,,], # value for species 1
-                        alpha.s = cloglog(dataSumm$stats$naiveOcc)[1], # value for species 1
+                        lam.0 = cloglog(dataSumm$stats$naiveOcc)[1], # value for species 1
                         gamma.0 = boot::inv.logit(0.2),
                         Trend = rnorm(n=1))
       if(inclPanTrap) {
@@ -147,9 +147,9 @@ runModel <- function(dataConstants,
                            inits = init.vals)
 
       # step 3 build an MCMC object using buildMCMC(). we can add some customization here
-      params <- c("mu.lambda","Trend")
+      params <- c("lam.0bda","Trend")
       if(allPars) {
-        params <- c(params, 'alpha.s','gamma.0', 'psi.fs')
+        params <- c(params, 'lam.0','gamma.0', 'psi.fs')
         if(inclPanTrap) params <- c(params,'alpha.0')
         if(inclPanTrap & inclPhenology) params <- c(params, 'alpha.1')
         if(inclPhenology) params <- c(params, "beta1", "beta2", 'gamma.1')
@@ -184,7 +184,7 @@ runModel <- function(dataConstants,
 
         # finish initialization
         spInits <- list(z = Z,
-                        alpha.s = cloglog(dataSumm$stats$naiveOcc)[sp])
+                        lam.0 = cloglog(dataSumm$stats$naiveOcc)[sp])
         if(inclPanTrap) spInits$alpha.0 = boot::inv.logit(dataSumm$stats$reportingRate[sp]) # replace with reportingRate_1 when I can calculate it
         Cmodel$setInits(spInits)
 

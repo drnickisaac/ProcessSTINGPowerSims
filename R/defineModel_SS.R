@@ -16,7 +16,7 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
     ######################### state model
     for(j in 1:nsite){
         for(t in 1:nyear){
-          linPred[j,t] <- alpha.s + Trend * t + eta[j]
+          linPred[j,t] <- lam.0 + Trend * t + eta[j]
           log(lambda[j,t]) <- linPred[j,t]
           cloglog(psi[j,t]) <- linPred[j,t]
           z[j,t] ~ dbern(psi[j,t]) # True occupancy status
@@ -26,7 +26,7 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
     for(j in 1:nsite) {eta[j] ~ dnorm(0, sd=sd.eta)} # site-level random effect
     sd.eta ~ T(dt(0, 1, 1), 0, 10) # constrained
     Trend ~ dnorm(0, tau=0.0001)
-    alpha.s ~ dnorm(0, tau=0.0001)
+    lam.0 ~ dnorm(0, tau=0.0001)
 
     ######################### Obs model
     for(k in 1:nvisit) {
@@ -79,8 +79,8 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
     }
     #########################  derived parameters
     for(t in 1:nyear){
-      psi.fs[t] <- mean(z[1:nsite],t)
-      mu.lambda[t] <- mean(lambda[1:nsite,t])
+      psi.fs[t] <- mean(z[1:nsite,t])
+      lam.0bda[t] <- mean(lambda[1:nsite,t])
     }
   })
   return(modelcode)
