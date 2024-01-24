@@ -35,7 +35,7 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
             y1[k] ~ dbin(size = nT[k], prob = Py[k]) # Observed data
             Py[k] <- z[site[k], year[k]] * p1[k]
             if(inclPhenology){
-              logit(p1[k]) <- alpha.0 - alpha.1 * (f_JD[JulDate[k]] - max(f_JD[1:365]))
+              logit(p1[k]) <- alpha.0 + alpha.1 * (f_JD[JulDate[k]] - max(f_JD[1:365]))
             } else {
               logit(p1[k]) <- alpha.0
             }
@@ -50,7 +50,7 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
           #expectCount[k] <- Multiplier * lambda[site[k], year[k]] * pThin[k]
           log(expectCount[k]) <- linPred[site[k], year[k]] * log(p2[k])
           if(inclPhenology){
-            logit(p2[k]) <- gamma.0 - gamma.1 * (f_JD[JulDate[k]] - max(f_JD[1:365]))
+            logit(p2[k]) <- gamma.0 + gamma.1 * (f_JD[JulDate[k]] - max(f_JD[1:365]))
           } else {
             logit(p2[k]) <- gamma.0
           }
