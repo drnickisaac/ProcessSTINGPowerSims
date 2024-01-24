@@ -39,7 +39,6 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
             } else {
               logit(p1[k]) <- alpha.0
             }
-            #p1[k] <- alpha.p * pThin[k]
           } # Should I add site + year effects to detectability?
 
           ##### transects
@@ -47,7 +46,6 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
           if(incl2ndTransect){
             y3[k] ~ dpois(expectCount[k]) # Observed counts. Might need a NegBin here or Zero-inflated
           }
-          #expectCount[k] <- Multiplier * lambda[site[k], year[k]] * pThin[k]
           log(expectCount[k]) <- linPred[site[k], year[k]] * log(p2[k])
           if(inclPhenology){
             logit(p2[k]) <- gamma.0 + gamma.1 * (f_JD[JulDate[k]] - max(f_JD[1:365]))
@@ -81,7 +79,7 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
     }
     #########################  derived parameters
     for(t in 1:nyear){
-      #psi.fs[t] <- mean(z[1:nsite],t)
+      psi.fs[t] <- mean(z[1:nsite],t)
       mu.lambda[t] <- mean(lambda[1:nsite,t])
     }
   })
