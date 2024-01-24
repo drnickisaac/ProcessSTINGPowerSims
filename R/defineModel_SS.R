@@ -80,7 +80,7 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
     #########################  derived parameters
     for(t in 1:nyear){
       psi.fs[t] <- mean(z[1:nsite,t])
-      lam.0bda[t] <- mean(lambda[1:nsite,t])
+      mu.lambda[t] <- mean(lambda[1:nsite,t])
     }
   })
   return(modelcode)

@@ -147,7 +147,7 @@ runModel <- function(dataConstants,
                            inits = init.vals)
 
       # step 3 build an MCMC object using buildMCMC(). we can add some customization here
-      params <- c("lam.0bda","Trend")
+      params <- c("mu.lambda","Trend")
       if(allPars) {
         params <- c(params, 'lam.0','gamma.0', 'psi.fs')
         if(inclPanTrap) params <- c(params,'alpha.0')
