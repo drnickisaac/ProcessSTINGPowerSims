@@ -16,15 +16,15 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
     ######################### state model
     for(j in 1:nsite){
         for(t in 1:nyear){
-          linPred[j,t] <- alpha.s + Trend * t #+ eta[j]
+          linPred[j,t] <- alpha.s + Trend * t + eta[j]
           log(lambda[j,t]) <- linPred[j,t]
           cloglog(psi[j,t]) <- linPred[j,t]
           z[j,t] ~ dbern(psi[j,t]) # True occupancy status
     }}
 
     ######################### state model priors
-    #for(j in 1:nsite) {eta[j] ~ dnorm(0, sd=sd.eta)} # site-level random effect
-    #sd.eta ~ T(dt(0, 1, 1), 0, 10) # constrained
+    for(j in 1:nsite) {eta[j] ~ dnorm(0, sd=sd.eta)} # site-level random effect
+    sd.eta ~ T(dt(0, 1, 1), 0, 10) # constrained
     Trend ~ dnorm(0, tau=0.0001)
     alpha.s ~ dnorm(0, tau=0.0001)
 
@@ -65,10 +65,15 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
     ######################### Obs model priors
     if(inclPanTrap){
       alpha.0 ~ dnorm(-2, tau = 0.0001) # logit detection probability per pan trap at peak phenology (or mean across year).
-      if(inclPhenology){alpha.1 ~ T(dt(0, 1, 1), 0, Inf)} # scaling parameter for detection on pan trap
+      if(inclPhenology){
+        #alpha.1 ~ T(dt(0, 1, 1), 0, Inf)
+        alpha.1 ~ dnorm(2, tau = 0.0001)
+        } # scaling parameter for detection on pan trap
     }
     gamma.0 ~ dnorm(-2, tau = 0.0001) # detection probability GLM on transects at peak phenology
-    gamma.1 ~ T(dt(0, 1, 1), 0, Inf) # scaling factor for detection on transects with seasonality
+    #gamma.1 ~ T(dt(0, 1, 1), 0, Inf) # scaling factor for detection on transects with seasonality
+    gamma.1 ~ dnorm(2, tau = 0.0001) # detection probability GLM on transects at peak phenology
+
 
     if(inclPhenology){
       beta1 ~ dunif(50, 300) # peak detectability/activity. Not constrained to fall within the field season (c(100, 250))
