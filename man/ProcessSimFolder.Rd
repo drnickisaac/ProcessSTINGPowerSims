@@ -12,6 +12,7 @@ ProcessSimFolder(
   incl2ndTransect = TRUE,
   inclPanTrap = TRUE,
   inclPhenology = TRUE,
+  inclStateRE = TRUE,
   multiSp = FALSE,
   parallelize = FALSE,
   allPars = FALSE,
@@ -38,6 +39,8 @@ ProcessSimFolder(
 \item{inclPanTrap}{should the model include pan trap data?}
 
 \item{inclPhenology}{should the model account for seasonal variation?}
+
+\item{inclStateRE}{should there be a site-level random effect in the state model?}
 
 \item{multiSp}{should the model be run for species separately, or in a multispecies model?}
 

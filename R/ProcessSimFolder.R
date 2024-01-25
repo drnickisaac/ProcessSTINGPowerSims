@@ -11,6 +11,7 @@
 #' @param inclPanTrap should the model include pan trap data?
 #' @param incl2ndTransect should the model include data from the second transect walk?
 #' @param inclPhenology should the model account for seasonal variation?
+#' @param inclStateRE should there be a site-level random effect in the state model?
 #' @param multiSp should the model be run for species separately, or in a multispecies model?
 #' @param parallelize option to parallelize across MCMC chains
 #' @param allPars if `TRUE` then all model parameters are monitored. If `FALSE`, just `mu.lambda` and `Trend`.
@@ -32,6 +33,7 @@ ProcessSimFolder <- function(inPath = ".",
                             incl2ndTransect = TRUE,
                             inclPanTrap = TRUE,
                             inclPhenology = TRUE,
+                            inclStateRE = TRUE,
                             multiSp = FALSE,
                             parallelize = FALSE,
                             allPars = FALSE,

@@ -4,27 +4,35 @@
 #' @param inclPhenology should the model account for seasonal variation?
 #' @param inclPanTrap should the model include pan trap data?
 #' @param incl2ndTransect should the model include data from the second transect walk?
+#' @param inclStateRE should there be a site-level random effect in the state model?
 #' @return a set of code
 #' @import nimble
 #' @export
 
 defineModel_SS <- function(incl2ndTransect = TRUE,
                            inclPanTrap = TRUE,
-                           inclPhenology = TRUE){
+                           inclPhenology = TRUE,
+                           inclStateRE = TRUE){
 
   modelcode <- nimbleCode({
     ######################### state model
     for(j in 1:nsite){
         for(t in 1:nyear){
-          linPred[j,t] <- lam.0 + Trend * t + eta[j]
+          if(inclStateRE){
+            linPred[j,t] <- lam.0 + Trend * t + eta[j]
+          } else {
+              linPred[j,t] <- lam.0 + Trend
+          }
           log(lambda[j,t]) <- linPred[j,t]
           cloglog(psi[j,t]) <- linPred[j,t]
           z[j,t] ~ dbern(psi[j,t]) # True occupancy status
     }}
 
     ######################### state model priors
-    for(j in 1:nsite) {eta[j] ~ dnorm(0, sd=sd.eta)} # site-level random effect
-    sd.eta ~ T(dt(0, 1, 1), 0, 10) # constrained
+    if(inclStateRE){
+      for(j in 1:nsite) {eta[j] ~ dnorm(0, sd=sd.eta)} # site-level random effect
+      sd.eta ~ T(dt(0, 1, 1), 0, 10) # constrained
+    }
     Trend ~ dnorm(0, tau=0.0001)
     lam.0 ~ dnorm(0, tau=0.0001)
 

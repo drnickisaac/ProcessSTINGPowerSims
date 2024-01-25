@@ -7,7 +7,8 @@
 defineModel_SS(
   incl2ndTransect = TRUE,
   inclPanTrap = TRUE,
-  inclPhenology = TRUE
+  inclPhenology = TRUE,
+  inclStateRE = TRUE
 )
 }
 \arguments{
@@ -16,6 +17,8 @@ defineModel_SS(
 \item{inclPanTrap}{should the model include pan trap data?}
 
 \item{inclPhenology}{should the model account for seasonal variation?}
+
+\item{inclStateRE}{should there be a site-level random effect in the state model?}
 }
 \value{
 a set of code

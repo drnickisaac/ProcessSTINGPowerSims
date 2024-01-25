@@ -8,6 +8,7 @@
 #' @param inclPanTrap should the model include pan trap data?
 #' @param incl2ndTransect should the model include data from the second transect walk?
 #' @param inclPhenology should the model account for seasonal variation?
+#' @param inclStateRE should there be a site-level random effect in the state model?
 #' @param multiSp should the model be run as a multispecies model, or many single-species models?
 #' @param parallelize should the chains be run as separate processes on different cores?
 #' @param allPars if `TRUE` then all model parameters are monitored. If `FALSE`, just `lam.0bda` and `Trend`.
@@ -31,7 +32,8 @@ runModel <- function(dataConstants,
                      inclPanTrap = TRUE,
                      incl2ndTransect = TRUE,
                      inclPhenology = TRUE,
-                     multiSp = TRUE,
+                     inclStateRE = TRUE,
+                     multiSp = FALSE,
                      parallelize = FALSE,
                      allPars = FALSE,
                      n.iter = 1000,
@@ -79,11 +81,9 @@ runModel <- function(dataConstants,
                                         alpha.p = dataSumm$stats$reportingRate, # replace with reportingRate_1 when I can calculate it
                                         beta1 = rep(180, dataConstants$nsp),
                                         beta2 = rep(50, dataConstants$nsp),
-                                        #phScale = rep(1, dataConstants$nsp),
-                                        Multiplier = 1,
                                         sd.eta = 2,
                                         eta = rnorm(n=dataConstants$nsite, mean=0, sd=2),
-                                        tau.trend = abs(rt(1, 1)),
+                                        #tau.trend = abs(rt(1, 1)),
                                         Trend = rnorm(n=1))
       )
 
@@ -138,6 +138,10 @@ runModel <- function(dataConstants,
         init.vals$beta1 <- 180
         init.vals$beta2 <- 50
         init.vals$gamma.1 <- 1
+      }
+      if(inclStateRE){
+        init.vals$sd.eta <- 2
+        init.vals$eta <- rnorm(n=dataConstants$nsite, mean=0, sd=2)
       }
 
       # step 2 create an operational from from NIMBLE/BUGS code

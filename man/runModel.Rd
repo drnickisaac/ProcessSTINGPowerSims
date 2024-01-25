@@ -12,7 +12,8 @@ runModel(
   inclPanTrap = TRUE,
   incl2ndTransect = TRUE,
   inclPhenology = TRUE,
-  multiSp = TRUE,
+  inclStateRE = TRUE,
+  multiSp = FALSE,
   parallelize = FALSE,
   allPars = FALSE,
   n.iter = 1000,
@@ -35,11 +36,13 @@ runModel(
 
 \item{inclPhenology}{should the model account for seasonal variation?}
 
+\item{inclStateRE}{should there be a site-level random effect in the state model?}
+
 \item{multiSp}{should the model be run as a multispecies model, or many single-species models?}
 
 \item{parallelize}{should the chains be run as separate processes on different cores?}
 
-\item{allPars}{if \code{TRUE} then all model parameters are monitored. If \code{FALSE}, just \code{mu.lambda} and \code{Trend}.}
+\item{allPars}{if \code{TRUE} then all model parameters are monitored. If \code{FALSE}, just \code{lam.0bda} and \code{Trend}.}
 
 \item{n.iter}{number of iterations for the Nimble model. Default is 1000.}
 

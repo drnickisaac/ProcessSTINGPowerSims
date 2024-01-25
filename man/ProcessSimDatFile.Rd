@@ -12,6 +12,7 @@ ProcessSimDatFile(
   inclPhenology = TRUE,
   incl2ndTransect = TRUE,
   inclPanTrap = TRUE,
+  inclStateRE = TRUE,
   multiSp = FALSE,
   parallelize = FALSE,
   allPars = FALSE,
@@ -37,6 +38,8 @@ ProcessSimDatFile(
 \item{incl2ndTransect}{should the model include data from the second transect walk?}
 
 \item{inclPanTrap}{should the model include pan trap data?}
+
+\item{inclStateRE}{should there be a site-level random effect in the state model?}
 
 \item{multiSp}{should the model be run for each species separately, or in a single model?}
 
