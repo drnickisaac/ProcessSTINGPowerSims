@@ -39,9 +39,10 @@ formatData <- function(inData,
   md$datastr$sp_n_Site <- data.frame(species = names(sp_n_Site), nSite = as.numeric(sp_n_Site))
   md$settings <- list(sp_modelled = length(sp2incl),
                    minSite = minSite,
-                  #inclPhenology = inclPhenology,
+                   inclPhenology = inclPhenology,
                    inclPanTrap = inclPanTrap,
-                   incl2ndTransect = incl2ndTransect)
+                   incl2ndTransect = incl2ndTransect,
+                   inclStateRE = inclStateRE)
 
   dataConstants <- list(nsp = md$settings["sp_modelled"],
                         nsite = md$simpars$sites,
