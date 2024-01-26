@@ -11,9 +11,10 @@
 
 formatData <- function(inData,
                        minSite = 1,
-                       #inclPhenology = TRUE,
+                       inclPhenology = TRUE,
                        incl2ndTransect = TRUE,
-                       inclPanTrap = TRUE){
+                       inclPanTrap = TRUE,
+                       inclStateRE = TRUE){
 
   castDat <- dcast(inData, year + round + siteID + jday + total_pantraps ~ "nsp",
                    value.var = "abundance", fun = length, fill = 0)

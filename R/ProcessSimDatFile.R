@@ -63,9 +63,10 @@ ProcessSimDatFile <- function(filename,
   # format the data (includes removing species found on few sites)
   formattedData <- formatData(indata,
                               minSite = minSite,
-                              #inclPhenology = inclPhenology,
+                              inclPhenology = inclPhenology,
                               inclPanTrap = inclPanTrap,
-                              incl2ndTransect = incl2ndTransect)
+                              incl2ndTransect = incl2ndTransect,
+                              inclStateRE = inclStateRE)
 
   # if appropriate, limit the number of species
   formattedData$md$settings$maxSp <- min(maxSp, formattedData$md$settings$sp_modelled)
