@@ -72,13 +72,13 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
     if(inclPanTrap){
       alpha.0 ~ dnorm(-2, tau = 0.0001) # logit detection probability per pan trap at peak phenology (or mean across year).
       if(inclPhenology){
-        #alpha.1 ~ T(dt(0, 1, 1), 0, Inf)
-        alpha.1 ~ dnorm(2, tau = 0.0001)
+        alpha.1 ~ T(dt(0, 1, 1), 0, Inf)
+        #alpha.1 ~ dnorm(2, tau = 0.0001)
         } # scaling parameter for detection on pan trap
     }
     gamma.0 ~ dnorm(-2, tau = 0.0001) # detection probability GLM on transects at peak phenology
-    #gamma.1 ~ T(dt(0, 1, 1), 0, Inf) # scaling factor for detection on transects with seasonality
-    gamma.1 ~ dnorm(2, tau = 0.0001) # detection probability GLM on transects at peak phenology
+    gamma.1 ~ T(dt(0, 1, 1), 0, Inf) # scaling factor for detection on transects with seasonality
+    #gamma.1 ~ dnorm(2, tau = 0.0001) # detection probability GLM on transects at peak phenology
 
 
     if(inclPhenology){
