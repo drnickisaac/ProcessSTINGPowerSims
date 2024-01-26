@@ -23,7 +23,6 @@
 #' @import pbmcapply
 #' @import parallel
 #' @import coda
-#' @import boot
 
 runModel <- function(dataConstants,
                      obsData,
@@ -124,14 +123,15 @@ runModel <- function(dataConstants,
       # step 1 define the model code
       modelcode <- defineModel_SS(inclPhenology = inclPhenology,
                                   inclPanTrap = inclPanTrap,
-                                  incl2ndTransect = incl2ndTransect)
+                                  incl2ndTransect = incl2ndTransect,
+                                  inclStateRE = inclStateRE)
 
       init.vals <- list(z = dataSumm$occMatrix[1,,], # value for species 1
                         lam.0 = cloglog(dataSumm$stats$naiveOcc)[1], # value for species 1
-                        gamma.0 = boot::inv.logit(0.2),
+                        gamma.0 = ilogit(0.2),
                         Trend = rnorm(n=1))
       if(inclPanTrap) {
-        init.vals$alpha.0 <- boot::inv.logit(dataSumm$stats$reportingRate[1]) # value for species 1
+        init.vals$alpha.0 <- ilogit(dataSumm$stats$reportingRate[1]) # value for species 1
         if(inclPhenology) init.vals$alpha.1 <- 1
       }
       if(inclPhenology){
@@ -157,6 +157,7 @@ runModel <- function(dataConstants,
         if(inclPanTrap) params <- c(params,'alpha.0')
         if(inclPanTrap & inclPhenology) params <- c(params, 'alpha.1')
         if(inclPhenology) params <- c(params, "beta1", "beta2", 'gamma.1')
+        if(inclStateRE) params <- c(params, "sd.eta")
       }
 
       occMCMC <- buildMCMC(model,
@@ -189,7 +190,7 @@ runModel <- function(dataConstants,
         # finish initialization
         spInits <- list(z = Z,
                         lam.0 = cloglog(dataSumm$stats$naiveOcc)[sp])
-        if(inclPanTrap) spInits$alpha.0 = boot::inv.logit(dataSumm$stats$reportingRate[sp]) # replace with reportingRate_1 when I can calculate it
+        if(inclPanTrap) spInits$alpha.0 = ilogit(dataSumm$stats$reportingRate[sp]) # replace with reportingRate_1 when I can calculate it
         Cmodel$setInits(spInits)
 
         # test whether the model is fully initialised
