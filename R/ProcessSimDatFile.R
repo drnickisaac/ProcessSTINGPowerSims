@@ -69,7 +69,8 @@ ProcessSimDatFile <- function(filename,
                               inclStateRE = inclStateRE)
 
   # if appropriate, limit the number of species
-  formattedData$md$settings$maxSp <- min(maxSp, formattedData$md$settings$sp_modelled)
+  numSp <- min(maxSp, formattedData$md$settings$sp_modelled)
+  formattedData$md$settings$maxSp <- numSp
 
   # SUMMARISE the data
   dataSumm <- with(formattedData, summariseData(obsData, dataConstants))
@@ -90,14 +91,14 @@ ProcessSimDatFile <- function(filename,
                        n.burn = n.burn,
                        n.thin = n.thin,
                        n.chain = n.chain,
-                       maxSp = formattedData$md$settings$maxSp)
+                       maxSp = numSp)
 
   #clean up the name of the file. Remove the folder names and file suffix
   name <- gsub(filename, patt = "\\.rds", repl = "")
   name <- gsub(name, patt = "scenario_", repl = "")
   name <- strsplit(name, "/")[[1]]
   name <- name[length(name)]
-  name <- paste0(name, "_Res_",maxSp,"Sp_",n.iter,"it.rds")
+  name <- paste0(name, "_Res_",numSp,"Sp_",n.iter,"it.rds")
 
   # finish up an complete the job
   output <- list(dataFileName = filename,
@@ -105,17 +106,18 @@ ProcessSimDatFile <- function(filename,
                  md = formattedData$md,
                  dataSummStats = dataSumm$stats,
                  modelEff = modelEff,
-                 runSettings = c(inclPhenology = inclPhenology,
-                                 incl2ndTransect = incl2ndTransect,
-                                 inclPanTrap = inclPanTrap,
-                                 inclPhenology = inclPhenology,
-                                 inclStateRE = inclStateRE,
-                                 multiSp = multiSp,
-                                 parallelize = parallelize,
-                                 n.iter = n.iter,
-                                 n.burn = n.burn,
-                                 n.thin = n.thin,
-                                 n.chain = n.chain),
+                 runSettings = list(data= c(incl2ndTransect = incl2ndTransect,
+                                           inclPanTrap = inclPanTrap,
+                                           inclPhenology = inclPhenology,
+                                           inclStateRE = inclStateRE,
+                                           minSite = minSite,
+                                           numSp = numSp),
+                                    model = c(multiSp = multiSp,
+                                           parallelize = parallelize,
+                                           n.iter = n.iter,
+                                           n.burn = n.burn,
+                                           n.thin = n.thin,
+                                           n.chain = n.chain)),
                 spDat = sapply(formattedData$obsData, function(x) rowSums(x>0)),
                 Version = packageVersion("ProcessSTINGPowerSims"),
                 timestamp  = format(Sys.time(), "%y-%m-%d %H:%M:%S"))

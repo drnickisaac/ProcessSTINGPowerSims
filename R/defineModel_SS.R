@@ -21,7 +21,7 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
           if(inclStateRE){
             linPred[j,t] <- lam.0 + Trend * (t-1) + eta[j]
           } else {
-              linPred[j,t] <- lam.0 + Trend
+            linPred[j,t] <- lam.0 + Trend * (t-1)
           }
           log(lambda[j,t]) <- linPred[j,t]
           cloglog(psi[j,t]) <- linPred[j,t]

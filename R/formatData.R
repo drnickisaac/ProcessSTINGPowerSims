@@ -10,11 +10,7 @@
 #' @export
 
 formatData <- function(inData,
-                       minSite = 1,
-                       inclPhenology = TRUE,
-                       incl2ndTransect = TRUE,
-                       inclPanTrap = TRUE,
-                       inclStateRE = TRUE){
+                       minSite = 1){
 
   castDat <- dcast(inData, year + round + siteID + jday + total_pantraps ~ "nsp",
                    value.var = "abundance", fun = length, fill = 0)
@@ -39,11 +35,7 @@ formatData <- function(inData,
   md <- formatMetadata(inData)
   md$datastr$sp_n_Site <- data.frame(species = names(sp_n_Site), nSite = as.numeric(sp_n_Site))
   md$settings <- list(sp_modelled = length(sp2incl),
-                   minSite = minSite,
-                   inclPhenology = inclPhenology,
-                   inclPanTrap = inclPanTrap,
-                   incl2ndTransect = incl2ndTransect,
-                   inclStateRE = inclStateRE)
+                   minSite = minSite)
 
   dataConstants <- list(nsp = md$settings["sp_modelled"],
                         nsite = md$simpars$sites,
