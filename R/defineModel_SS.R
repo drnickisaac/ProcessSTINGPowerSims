@@ -19,7 +19,7 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
     for(j in 1:nsite){
         for(t in 1:nyear){
           if(inclStateRE){
-            linPred[j,t] <- lam.0 + Trend * t + eta[j]
+            linPred[j,t] <- lam.0 + Trend * (t-1) + eta[j]
           } else {
               linPred[j,t] <- lam.0 + Trend
           }
