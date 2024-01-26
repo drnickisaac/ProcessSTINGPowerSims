@@ -10,6 +10,8 @@
 #' @export
 
 formatData <- function(inData,
+                       incl2ndTransect = TRUE,
+                       inclPanTrap = TRUE,
                        minSite = 1){
 
   castDat <- dcast(inData, year + round + siteID + jday + total_pantraps ~ "nsp",

@@ -61,7 +61,8 @@ ProcessSimDatFile <- function(filename,
   print(paste("Successfully read in", filename))
 
   # format the data (includes removing species found on few sites)
-  formattedData <- formatData(indata, minSite = minSite)
+  formattedData <- formatData(indata, minSite = minSite, inclPanTrap = inclPanTrap,
+                              incl2ndTransect = incl2ndTransect)
 
   # if appropriate, limit the number of species
   numSp <- min(maxSp, formattedData$md$settings$sp_modelled)

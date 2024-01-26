@@ -4,16 +4,16 @@
 \alias{formatData}
 \title{formatData}
 \usage{
-formatData(inData, minSite = 1)
+formatData(inData, incl2ndTransect = TRUE, inclPanTrap = TRUE, minSite = 1)
 }
 \arguments{
 \item{inData}{A dataset produced by the simulations}
 
-\item{minSite}{the threshold minimum number of sites for a species to be considered for modelling}
+\item{incl2ndTransect}{should the model include data from the second transect walk?}
 
 \item{inclPanTrap}{should the model include pan trap data?}
 
-\item{incl2ndTransect}{should the model include data from the second transect walk?}
+\item{minSite}{the threshold minimum number of sites for a species to be considered for modelling}
 }
 \value{
 list of two data frames
