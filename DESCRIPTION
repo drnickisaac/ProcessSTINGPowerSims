@@ -1,6 +1,6 @@
 Package: ProcessSTINGPowerSims
 Title: Analyse Outputs from STING2 Power Simulations
-Version: 0.9.4
+Version: 0.9.5
 Date: 2024-01-24
 Authors@R: 
     person("Nick", "Isaac", , "njbi@ceh.ac.uk", role = c("aut", "cre"),

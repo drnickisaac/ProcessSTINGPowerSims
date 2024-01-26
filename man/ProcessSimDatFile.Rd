@@ -12,7 +12,7 @@ ProcessSimDatFile(
   inclPhenology = TRUE,
   incl2ndTransect = TRUE,
   inclPanTrap = TRUE,
-  inclStateRE = TRUE,
+  inclStateRE = FALSE,
   multiSp = FALSE,
   parallelize = FALSE,
   allPars = FALSE,

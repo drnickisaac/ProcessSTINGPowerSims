@@ -8,7 +8,7 @@ defineModel_SS(
   incl2ndTransect = TRUE,
   inclPanTrap = TRUE,
   inclPhenology = TRUE,
-  inclStateRE = TRUE
+  inclStateRE = FALSE
 )
 }
 \arguments{

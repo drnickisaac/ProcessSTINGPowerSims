@@ -12,7 +12,7 @@ runModel(
   inclPanTrap = TRUE,
   incl2ndTransect = TRUE,
   inclPhenology = TRUE,
-  inclStateRE = TRUE,
+  inclStateRE = FALSE,
   multiSp = FALSE,
   parallelize = FALSE,
   allPars = FALSE,
