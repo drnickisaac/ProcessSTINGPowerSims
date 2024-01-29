@@ -23,6 +23,8 @@
 #' @import pbmcapply
 #' @import parallel
 #' @import coda
+#' @import reshape2
+#' @import lme4
 
 runModel <- function(dataConstants,
                      obsData,
@@ -48,23 +50,22 @@ runModel <- function(dataConstants,
     parallelize <- FALSE
   }
 
+  ###################################################################
+  # kludge required: if maxSp is set to 1 (or zero) then problems arise later.
+  if(maxSp < 2) maxSp <- 2
+
+  # truncate the dataset if there are too many species
+  if(dim(obsData$y2)[1] > maxSp){
+    obsData <- lapply(obsData, function(x) x[1:maxSp,])
+    dataSumm$occMatrix <- dataSumm$occMatrix[1:maxSp,,]
+    dataSumm$stats <- dataSumm$stats[1:maxSp,]
+    dataConstants$nsp <- maxSp
+    print(paste('Warning: only the first', maxSp, 'will be used in modelling: others will be ignored'))
+  }
+
+    ###################################################################
   if(useNimble) {
     if(is.null(n.burn)) n.burn = n.iter/2
-
-    ###################################################################
-    # kludge required: if maxSp is set to 1 (or zero) then problems arise later.
-    if(maxSp < 2) maxSp <- 2
-
-    # truncate the dataset if there are too many species
-    if(dim(obsData$y2)[1] > maxSp){
-      obsData <- lapply(obsData, function(x) x[1:maxSp,])
-      dataSumm$occMatrix <- dataSumm$occMatrix[1:maxSp,,]
-      dataSumm$stats <- dataSumm$stats[1:maxSp,]
-      dataConstants$nsp <- maxSp
-      print(paste('Warning: only the first', maxSp, 'will be used in modelling: others will be ignored'))
-    }
-
-    ###################################################################
 
     if(multiSp == TRUE){ # Multispecies option
 
@@ -249,12 +250,19 @@ runModel <- function(dataConstants,
 
   }
   else {
-    # for simplicity, let's just report the annual fitted total count
-    totalObs <- rowSums(sapply(obsData, colSums))
-    mod <- with(dataConstants, glm(totalObs ~ factor(year) + site, family = "poisson"))
+    # for simplicity, let's just report the annual total count across all data types
+    totalObs <- sapply(1:maxSp, function(i) rowSums(sapply(obsData, function(x) x[i,])))
 
-    yearEff <- c(1, exp(coef(mod)[grep("factor", names(coef(mod)))]))
-    names(yearEff) <- paste0("Year", 1:dataConstants$nyear)
+    mData <- with(dataConstants, data.frame(site=site, year=year))
+    mData <- melt(cbind(mData, totalObs), id=1:2)
+    names(mData)[3] <- "species"
+
+    #mod <- lme4::glmer(value ~ year + species + site + (year|species), data = mData, family = "poisson")
+    mod <- lme4::lmList(value ~ year + factor(site) | species, data = mData, family = "poisson")
+
+    yearEff <- coef(mod)$year
+    names(yearEff) <- paste0("species", unique(mData$species))
+    #names(yearEff) <- paste0("Year", 1:dataConstants$nyear)
   }
 
   return(yearEff)
