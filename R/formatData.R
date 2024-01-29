@@ -15,12 +15,12 @@ formatData <- function(inData,
                        minSite = 1){
 
   # first perform some basic checks on the data
-  if(any(!paste0("site_",1:attr(indata, "sites")) %in% indata$site)){
-    missingSite <- setdiff(paste0("site_",1:attr(indata, "sites")), indata$site)
+  if(any(!paste0("site_",1:attr(inData, "sites")) %in% inData$site)){
+    missingSite <- setdiff(paste0("site_",1:attr(inData, "sites")), inData$site)
     stop(paste0(missingSite, " has no records in the input data"))
   }
-  if(any(!1:attr(indata, "years") %in% indata$year)){
-    missingYear <- setdiff(1:attr(indata, "years"), indata$year)
+  if(any(!1:attr(inData, "years") %in% inData$year)){
+    missingYear <- setdiff(1:attr(inData, "years"), inData$year)
     stop(paste0(missingYear, " has no records in the input data"))
   }
   #### data checks complete
