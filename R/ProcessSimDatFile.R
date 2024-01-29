@@ -94,7 +94,10 @@ ProcessSimDatFile <- function(filename,
   name <- gsub(name, patt = "scenario_", repl = "")
   name <- strsplit(name, "/")[[1]]
   name <- name[length(name)]
-  name <- paste0(name, "_Res_",numSp,"Sp_",n.iter,"it.rds")
+  name <- paste0(name, "_Res_",numSp,"Sp_")
+  if(useNimble) {
+    name <- paste0(name, n.iter,"it.rds")
+  } else {name <- paste0(name, "GLM.rds")}
 
   # finish up an complete the job
   output <- list(dataFileName = filename,
@@ -107,6 +110,7 @@ ProcessSimDatFile <- function(filename,
                                            minSite = minSite,
                                            numSp = numSp),
                                     model = c(
+                                           useNimble = useNimble,
                                            inclPhenology = inclPhenology,
                                            inclStateRE = inclStateRE,
                                            multiSp = multiSp,
