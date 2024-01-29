@@ -14,6 +14,17 @@ formatData <- function(inData,
                        inclPanTrap = TRUE,
                        minSite = 1){
 
+  # first perform some basic checks on the data
+  if(any(!paste0("site_",1:attr(indata, "sites")) %in% indata$site)){
+    missingSite <- setdiff(paste0("site_",1:attr(indata, "sites")), indata$site)
+    stop(paste0(missingSite, " has no records in the input data"))
+  }
+  if(any(!1:attr(indata, "years") %in% indata$year)){
+    missingYear <- setdiff(1:attr(indata, "years"), indata$year)
+    stop(paste0(missingYear, " has no records in the input data"))
+  }
+  #### data checks complete
+
   castDat <- dcast(inData, year + round + siteID + jday + total_pantraps ~ "nsp",
                    value.var = "abundance", fun = length, fill = 0)
 
