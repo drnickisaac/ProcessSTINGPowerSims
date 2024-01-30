@@ -70,13 +70,13 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
     }
     ######################### Obs model priors
     if(inclPanTrap){
-      alpha.0 ~ dnorm(-2, tau = 0.0001) # logit detection probability per pan trap at peak phenology (or mean across year).
+      alpha.0 ~ dnorm(-2, tau = 1/2.72) # logit detection probability per pan trap at peak phenology (or mean across year).
       if(inclPhenology){
         alpha.1 ~ T(dt(0, 1, 1), 0, Inf) # constrained to be positive
         #alpha.1 ~ dnorm(2, tau = 0.0001)
         } # scaling parameter for detection on pan trap
     }
-    gamma.0 ~ dnorm(-2, tau = 0.0001) # detection probability GLM on transects at peak phenology
+    gamma.0 ~ dnorm(-2, tau = 1/2.72) # detection probability GLM on transects at peak phenology
 
 
     if(inclPhenology){

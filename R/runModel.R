@@ -191,7 +191,7 @@ runModel <- function(dataConstants,
         # finish initialization
         spInits <- list(z = Z,
                         lam.0 = cloglog(dataSumm$stats$naiveOcc)[sp])
-        if(inclPanTrap) spInits$alpha.0 = ilogit(dataSumm$stats$reportingRate[sp]) # replace with reportingRate_1 when I can calculate it
+        if(inclPanTrap) spInits$alpha.0 = ilogit(dataSumm$stats$reportingRate_z1[sp]) # replace with reportingRate_1 when I can calculate it
         Cmodel$setInits(spInits)
 
         # test whether the model is fully initialised
