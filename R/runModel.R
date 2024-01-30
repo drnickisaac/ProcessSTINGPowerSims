@@ -108,6 +108,10 @@ runModel <- function(dataConstants,
       # step 3 before compiling the MCMC object we need to compile the model first
       Cmodel <- compileNimble(model)
 
+      # test whether the model is fully initialised
+      if(is.na(Cmodel$calculate())) {stop("model not fully initialized")}
+      Cmodel$initializeInfo()
+
       # now the MCMC (project = NIMBLE model already associated with a project)
       CoccMCMC <- compileNimble(occMCMC, project = model)
 
