@@ -5,11 +5,16 @@
 #' @export
 
 
-formatMetadata <- function(indat){
- list(simpars = data.frame(
+formatMetadata <- function(indat,
+                           incl2ndTransect = TRUE,
+                           inclPanTrap = TRUE){
+  nTr <- ifelse(incl2ndTransect, as.numeric(attr(indat, "transects")), 1)
+  pans <- ifelse(inclPanTrap, attr(indat, "pantraps"), FALSE)
+
+  list(simpars = data.frame(
         trend = attr(indat, "trend"),
-        pantraps = attr(indat, "pantraps"),
-        transects = as.numeric(attr(indat, "transects")),
+        pantraps = pans,
+        transects = nTr,
         rounds = attr(indat, "rounds"),
         sites = attr(indat, "sites"),
         years = attr(indat, "years"),

@@ -45,7 +45,7 @@ formatData <- function(inData,
   print(paste('We proceed to modelling with', length(sp2incl), 'species'))
 
   # create metadata object
-  md <- formatMetadata(inData)
+  md <- formatMetadata(inData, incl2ndTransect=incl2ndTransect, inclPanTrap=inclPanTrap)
   md$datastr$sp_n_Site <- data.frame(species = names(sp_n_Site), nSite = as.numeric(sp_n_Site))
   md$settings <- list(sp_modelled = length(sp2incl),
                    minSite = minSite)
