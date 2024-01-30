@@ -97,9 +97,9 @@ defineModel_MS <- function(incl2ndTransect = TRUE,
     }
     #########################  derived parameters
     for(i in 1:nsp){
-      for(t in 1:nyr){
-      psi.fs[i,t] <- mean(z[i,1:nsite,t])
-      mu.lambda[i,t] <- mean(lambda[i,1:nsite, t])
+      for(t in 1:nyear){
+        psi.fs[i,t] <- mean(z[i,1:nsite,t])
+        mu.lambda[i,t] <- mean(lambda[i,1:nsite, t])
     }}
   })
   return(modelcode)
