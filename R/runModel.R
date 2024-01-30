@@ -101,9 +101,18 @@ runModel <- function(dataConstants,
                            data = obsData,
                            inits = init.vals)
 
+      params <- c("mu.lambda","Trend")
+      if(allPars) {
+        params <- c(params, 'lam.0','gamma.0', 'psi.fs', 'tau.trend')
+        if(inclPanTrap) params <- c(params,'alpha.0')
+        if(inclPanTrap & inclPhenology) params <- c(params, 'alpha.1')
+        if(inclPhenology) params <- c(params, "beta1", "beta2", 'gamma.1')
+        if(inclStateRE) params <- c(params, "sd.eta")
+      }
+
       # step 3 build an MCMC object using buildMCMC(). we can add some customization here
       occMCMC <- buildMCMC(model,
-                           monitors = c("Trend"),
+                           monitors = params,
                            thin = n.thin,
                            useConjugacy = FALSE) # useConjugacy controls whether conjugate samplers are assigned when possible
 
