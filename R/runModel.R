@@ -78,7 +78,7 @@ runModel <- function(dataConstants,
       init.vals <- list(z = dataSumm$occMatrix,
                         lam.0 = cloglog(dataSumm$stats$naiveOcc),
                         gamma.0 = rep(ilogit(0.2), times=maxSp),
-                        Trend = rnorm(n=maxSp))
+                        Trend = rnorm(n=1))
       if(inclPanTrap) {
         init.vals$alpha.0 <- ilogit(dataSumm$stats$reportingRate)
         if(inclPhenology) init.vals$alpha.1 <- rep(1, times=maxSp)

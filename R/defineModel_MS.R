@@ -35,6 +35,7 @@ defineModel_MS <- function(incl2ndTransect = TRUE,
       spTr[i] ~ dnorm(Trend, tau=tau.trend)
     }
     tau.trend ~ T(dt(0, 1, 1), 0, Inf) # Half Cauchy
+    Trend ~ dnorm(0, tau=0.0001)
 
     if(inclStateRE){
       for(j in 1:nsite) {eta[j] ~ dnorm(0, sd=sd.eta)} # site-level random effect
