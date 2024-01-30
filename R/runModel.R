@@ -70,22 +70,34 @@ runModel <- function(dataConstants,
     if(multiSp == TRUE){ # Multispecies option
 
       # step 1 define the model code
-      modelcode <- defineModel_MS(inclPhenology = inclPhenology, inclPanTrap = inclPanTrap) # this makes no difference!
+      modelcode <- defineModel_MS(inclPhenology = inclPhenology,
+                                  inclPanTrap = inclPanTrap,
+                                  incl2ndTransect = incl2ndTransect,
+                                  inclStateRE = inclStateRE)
+
+      init.vals <- list(z = dataSumm$occMatrix,
+                        lam.0 = cloglog(dataSumm$stats$naiveOcc),
+                        gamma.0 = rep(ilogit(0.2), times=maxSp),
+                        Trend = rnorm(n=maxSp))
+      if(inclPanTrap) {
+        init.vals$alpha.0 <- ilogit(dataSumm$stats$reportingRate)
+        if(inclPhenology) init.vals$alpha.1 <- rep(1, times=maxSp)
+      }
+      if(inclPhenology){
+        init.vals$beta1 <- rep(180, times=maxSp)
+        init.vals$beta2 <- rep(50, times=maxSp)
+        init.vals$gamma.1 <- rep(1, times=maxSp)
+      }
+      if(inclStateRE){
+        init.vals$sd.eta <- 2
+        init.vals$eta <- rnorm(n=dataConstants$nsite, mean=0, sd=2)
+      }
 
       # step 2 create an operational from from NIMBLE/BUGS code
       model <- nimbleModel(code = modelcode,
                            constants = dataConstants,
                            data = obsData,
-                           inits = list(z = dataSumm$occMatrix,
-                                        lam.0 = cloglog(dataSumm$stats$naiveOcc),
-                                        alpha.p = dataSumm$stats$reportingRate, # replace with reportingRate_1 when I can calculate it
-                                        beta1 = rep(180, dataConstants$nsp),
-                                        beta2 = rep(50, dataConstants$nsp),
-                                        sd.eta = 2,
-                                        eta = rnorm(n=dataConstants$nsite, mean=0, sd=2),
-                                        #tau.trend = abs(rt(1, 1)),
-                                        Trend = rnorm(n=1))
-      )
+                           inits = init.vals)
 
       # step 3 build an MCMC object using buildMCMC(). we can add some customization here
       occMCMC <- buildMCMC(model,
