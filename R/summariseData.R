@@ -25,29 +25,43 @@ summariseData <- function(obsData, dataConstants){
 
   occSpSite <- apply(occMatrix,c(1,2),max)
 
-  # Mean transect count: for calculating stats
+  # melt the occupancy per species:site combo
+  mOSS <- melt(occSpSite)
+  names(mOSS) <- c("species", "site", "occ")
+
+  ############## Reporting Rate
+  RR <- if(is.null(obsData$y1)) 0.000001 else rowMeans(obsData$y1/5)
+
+  RR1 <- if(is.null(obsData$y1)) NA else {
+    temp <- melt(as.data.frame(cbind(site=dataConstants$site, t(obsData$y1/5))), id=1)
+    names(temp)[c(2,3)] <- c("species", "TrapRate")
+    as.data.frame(merge(mOSS, temp, all=TRUE) %>%
+                    group_by(species) %>%
+                    summarise(mean(trMean[occ == 1])))
+  }
+
+  ############### Mean transect count: for calculating stats
   if(is.null(obsData$y3)) {
     trMean <- obsData$y2
   } else trMean <- (obsData$y2 + obsData$y3)/2
 
-  # calculate reportingRate_1
-  # trMean_1 <- trMean
-  # take dataConstants$site and trMean
-  # get occSpSite
-  # set trMean_1 to be trMean but restricted to sites that are occupied.
-  # get the rowMeans, as below
-  # calculate meanCount_1
-  # similar to above
+  temp <- melt(as.data.frame(cbind(site=dataConstants$site, t(trMean))), id=1)
+  names(temp)[2:3] <- c("species", "trMean")
+
+  MC1<- as.data.frame(merge(mOSS, temp, all=TRUE) %>%
+                        group_by(species) %>%
+                        summarise(mean(trMean[occ == 1])))
+
+  ##############
 
   stats <- data.frame(
     species = dimnames(occMatrix)[[1]],
     naiveOcc = apply(occSpSite, 1, mean),
-    reportingRate = ifelse(is.null(obsData$y1), 0.0001, rowMeans(obsData$y1/5)), # per pan trap
+    reportingRate = RR, # per pan trap
     meanCount = rowMeans(trMean), # mean count including zeros
-    reportingRate_1 = NA,#mean(with(obsData, y1/5)[occSites,]), # per pan trap. Need to coerce to same shape as above
-    meanCount_1 = NA#rowMeans(trMean_1, na.rm=T) # mean count when observed (not on all visits to occupied sites)
+    reportingRate_1 = as.numeric(RR1[,2]), # per pan trap. Need to coerce to same shape as above
+    meanCount_1 = as.numeric(MC1[,2]) # mean count when observed (not on all visits to occupied sites)
   )
-
   return(list(
     occMatrix = occMatrix,
     stats = stats))

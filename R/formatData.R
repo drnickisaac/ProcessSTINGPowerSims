@@ -17,7 +17,7 @@ formatData <- function(inData,
   # first perform some basic checks on the data
   if(any(!paste0("site_",1:attr(inData, "sites")) %in% inData$site)){
     missingSite <- setdiff(paste0("site_",1:attr(inData, "sites")), inData$site)
-    stop(paste0(missingSite, " has no records in the input data"))
+    warning(paste0(missingSite, " has no records in the input data"))
   }
   if(any(!1:attr(inData, "years") %in% inData$year)){
     missingYear <- setdiff(1:attr(inData, "years"), inData$year)
@@ -51,7 +51,7 @@ formatData <- function(inData,
                    minSite = minSite)
 
   dataConstants <- list(nsp = md$settings["sp_modelled"],
-                        nsite = md$simpars$sites,
+                        nsite = length(unique(inData$site)),#md$simpars$sites,
                         nvisit = nrow(castDat),
                         nyear = md$simpars$years,
                         year = castDat$year,
