@@ -37,7 +37,7 @@ summariseData <- function(obsData, dataConstants){
     names(temp)[c(2,3)] <- c("species", "TrapRate")
     as.data.frame(merge(mOSS, temp, all=TRUE) %>%
                     group_by(species) %>%
-                    summarise(mean(trMean[occ == 1])))
+                    summarise(mean(TrapRate[occ == 1])))
   }
 
   ############### Mean transect count: for calculating stats
@@ -59,9 +59,12 @@ summariseData <- function(obsData, dataConstants){
     naiveOcc = apply(occSpSite, 1, mean),
     reportingRate = RR, # per pan trap
     meanCount = rowMeans(trMean), # mean count including zeros
-    reportingRate_1 = as.numeric(RR1[,2]), # per pan trap. Need to coerce to same shape as above
-    meanCount_1 = as.numeric(MC1[,2]) # mean count when observed (not on all visits to occupied sites)
+    reportingRate_z1 = as.numeric(RR1[,2]), # per pan trap on occupied sites
+    meanCount_z1 = as.numeric(MC1[,2]), # mean count on occupied sites
+    nTrap_v1 = apply(obsData$y1, 1, function(x) mean(x[x>0])), # per pan trap where observed
+    medianCount_v1 = apply(trMean, 1, function(x) median(x[x>0])) # mean count when observed (not on all visits to occupied sites)
   )
+
   return(list(
     occMatrix = occMatrix,
     stats = stats))
