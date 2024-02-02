@@ -32,7 +32,7 @@ formatData <- function(inData,
   ### now limit the data to MaxSite.
   if(maxSite < length(unique(inData$siteID))){
     if(maxSite < 10) {maxSite <- 10}
-    inData <- subset(inData, siteID %in% paste("site_",1:maxSite))
+    inData <- subset(inData, siteID %in% paste0("site_",1:maxSite))
     print(paste("Subsetting the dataset to", maxSite,"sites"))
   }
 
@@ -53,7 +53,11 @@ formatData <- function(inData,
   sp2incl <- which(sp_n_Site > minSite)
   nExcl <- length(sp_n_Site) - length(sp2incl)
   print(paste('Note:',nExcl,'species out of', length(sp_n_Site), 'have been excluded because they occur on fewer than', minSite, 'sites'))
-  print(paste('We proceed to modelling with', length(sp2incl), 'species'))
+  if(length(sp2incl) > 0) {
+    print(paste('We proceed to modelling with', length(sp2incl), 'species'))
+  } else {
+    stop(paste0("There are no species with enough sites model"))
+  }
 
   # create metadata object
   md <- formatMetadata(inData, incl2ndTransect=incl2ndTransect, inclPanTrap=inclPanTrap)
