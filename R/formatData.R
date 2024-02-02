@@ -5,6 +5,9 @@
 #' @param inData A dataset produced by the simulations
 #' @param inclPanTrap should the model include pan trap data?
 #' @param incl2ndTransect should the model include data from the second transect walk?
+#' @param inclPhenology should the model account for seasonal variation?
+#' @param minSite the threshold minimum number of sites for a species to be considered for modelling
+#' @param maxSite defines a limit on the number of sites in the database
 #' @return list of two data frames
 #' @import reshape2
 #' @export
@@ -12,7 +15,8 @@
 formatData <- function(inData,
                        incl2ndTransect = TRUE,
                        inclPanTrap = TRUE,
-                       minSite = 1){
+                       inclPhenology = TRUE,
+                       minSite = 1, maxSite = 999){
 
   # first perform some basic checks on the data
   if(any(!paste0("site_",1:attr(inData, "sites")) %in% inData$site)){
@@ -24,6 +28,13 @@ formatData <- function(inData,
     stop(paste0(missingYear, " has no records in the input data"))
   }
   #### data checks complete
+
+  ### now limit the data to MaxSite.
+  if(maxSite < length(unique(inData$siteID))){
+    if(maxSite < 10) {maxSite <- 10}
+    inData <- subset(inData, siteID %in% paste("site_",1:maxSite))
+    print(paste("Subsetting the dataset to", maxSite,"sites"))
+  }
 
   castDat <- dcast(inData, year + round + siteID + jday + total_pantraps ~ "nsp",
                    value.var = "abundance", fun = length, fill = 0)
@@ -50,19 +61,20 @@ formatData <- function(inData,
   md$settings <- list(sp_modelled = length(sp2incl),
                    minSite = minSite)
 
-  dataConstants <- list(nsp = md$settings["sp_modelled"],
-                        nsite = length(unique(inData$site)),#md$simpars$sites,
+  dataConstants <- list(nsp = as.numeric(md$settings["sp_modelled"]),
+                        nsite = length(unique(inData$site)),
                         nvisit = nrow(castDat),
                         nyear = md$simpars$years,
                         year = castDat$year,
-                        site = as.numeric(gsub(castDat$siteID, patt="site_", repl="")),
-                        JulDate = castDat$jday,
-                        nT = castDat$total_pantraps)
+                        site = as.numeric(gsub(castDat$siteID, patt="site_", repl="")))
+
+  if(inclPhenology){dataConstants$JulDate <- castDat$jday}
 
   # extract the observations and populate the obsData list
   obsData <- list()
 
   if(inclPanTrap) {
+    dataConstants$nT <- castDat$total_pantraps
     ObsPan <- acast(inData, year + round + siteID ~ species,
                     value.var = "presences_pan", fill = 0)
     obsData$y1 <- t(ObsPan)[sp2incl,]

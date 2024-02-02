@@ -1,6 +1,8 @@
 #' Format Metadata
 #'
 #' @param indat A dataset produced by the simulations
+#' @param inclPanTrap should the model include pan trap data?
+#' @param incl2ndTransect should the model include data from the second transect walk?
 #' @return A one line dataframe
 #' @export
 
@@ -16,7 +18,7 @@ formatMetadata <- function(indat,
         pantraps = pans,
         transects = nTr,
         rounds = attr(indat, "rounds"),
-        sites = attr(indat, "sites"),
+        sites = length(unique(indat$siteID)),
         years = attr(indat, "years"),
         sp_pool = attr(indat, "sp_pool")
       ),

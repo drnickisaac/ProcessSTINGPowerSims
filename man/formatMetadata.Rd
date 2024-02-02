@@ -4,10 +4,14 @@
 \alias{formatMetadata}
 \title{Format Metadata}
 \usage{
-formatMetadata(indat)
+formatMetadata(indat, incl2ndTransect = TRUE, inclPanTrap = TRUE)
 }
 \arguments{
 \item{indat}{A dataset produced by the simulations}
+
+\item{incl2ndTransect}{should the model include data from the second transect walk?}
+
+\item{inclPanTrap}{should the model include pan trap data?}
 }
 \value{
 A one line dataframe

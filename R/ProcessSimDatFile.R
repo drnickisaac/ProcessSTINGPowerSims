@@ -19,6 +19,7 @@
 #' @param n.thin thinning for the MCMC chains. Defaults to 5
 #' @param n.chain number of MCMC chains. Defaults to 3
 #' @param minSite the threshold minimum number of sites for a species to be considered for modelling
+#' @param maxSite defines a limit on the number of sites in the database
 #' @param maxSp defines the maximum number of species to model. Species with numbers greater than this are ignored
 #' @return if `outpath` is NULL then a list comprising model output and metadata. Otherwise nothing
 #' @export
@@ -40,6 +41,7 @@ ProcessSimDatFile <- function(filename,
                               n.thin = 5,
                               n.chain = 3,
                               minSite = 1,
+                              maxSite = 999,
                               maxSp = 9999){
 
 #####################################################################
@@ -61,7 +63,8 @@ ProcessSimDatFile <- function(filename,
   print(paste("Successfully read in", filename))
 
   # format the data (includes removing species found on few sites)
-  formattedData <- formatData(indata, minSite = minSite, inclPanTrap = inclPanTrap,
+  formattedData <- formatData(indata, minSite = minSite, maxSite = maxSite,
+                              inclPanTrap = inclPanTrap,
                               incl2ndTransect = incl2ndTransect)
 
   # if appropriate, limit the number of species

@@ -20,6 +20,7 @@
 #' @param n.thin thinning for the MCMC chains. Defaults to 5
 #' @param n.chain number of MCMC chains. Defaults to 3
 #' @param minSite the threshold minimum number of sites for a species to be considered for modelling
+#' @param maxSite defines a limit on the number of sites in the database
 #' @param maxSp defines the maximum number of species to model. Species with numbers greater than this are ignored
 #' @param maxFiles defines the maximum number of files to work with. Additional files are ignored
 #' @return Nothing
@@ -42,6 +43,7 @@ ProcessSimFolder <- function(inPath = ".",
                             n.thin = 5,
                             n.chain = 3,
                             minSite = 1,
+                            maxSite = 999,
                             maxSp = 9999,
                             maxFiles = 9999){
 
@@ -80,7 +82,8 @@ ProcessSimFolder <- function(inPath = ".",
                    n.chain = n.chain,
                    multiSp = multiSp,
                    minSite = minSite,
-                   maxSp = maxSp)
+                   maxSp = maxSp,
+                   maxSite = maxSite)
 
   if(collateOutput){
     # we're going to take all the outputs together and format them into something pretty

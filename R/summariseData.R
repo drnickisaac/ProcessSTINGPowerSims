@@ -32,7 +32,7 @@ summariseData <- function(obsData, dataConstants){
   ############## Reporting Rate
   RR <- if(is.null(obsData$y1)) 0.000001 else rowMeans(obsData$y1/5)
 
-  RR1 <- if(is.null(obsData$y1)) NA else {
+  RR1 <- if(is.null(obsData$y1)) NULL else {
     temp <- melt(as.data.frame(cbind(site=dataConstants$site, t(obsData$y1/5))), id=1)
     names(temp)[c(2,3)] <- c("species", "TrapRate")
     as.data.frame(merge(mOSS, temp, all=TRUE) %>%

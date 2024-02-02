@@ -4,7 +4,14 @@
 \alias{formatData}
 \title{formatData}
 \usage{
-formatData(inData, incl2ndTransect = TRUE, inclPanTrap = TRUE, minSite = 1)
+formatData(
+  inData,
+  incl2ndTransect = TRUE,
+  inclPanTrap = TRUE,
+  inclPhenology = TRUE,
+  minSite = 1,
+  maxSite = 999
+)
 }
 \arguments{
 \item{inData}{A dataset produced by the simulations}
@@ -13,7 +20,11 @@ formatData(inData, incl2ndTransect = TRUE, inclPanTrap = TRUE, minSite = 1)
 
 \item{inclPanTrap}{should the model include pan trap data?}
 
+\item{inclPhenology}{should the model account for seasonal variation?}
+
 \item{minSite}{the threshold minimum number of sites for a species to be considered for modelling}
+
+\item{maxSite}{defines a limit on the number of sites in the database}
 }
 \value{
 list of two data frames
