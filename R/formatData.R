@@ -19,9 +19,20 @@ formatData <- function(inData,
                        minSite = 1, maxSite = 999){
 
   # first perform some basic checks on the data
-  if(any(!paste0("site_",1:attr(inData, "sites")) %in% inData$site)){
-    missingSite <- setdiff(paste0("site_",1:attr(inData, "sites")), inData$site)
-    warning(paste0(missingSite, " has no records in the input data"))
+  if(any(!paste0("site_",1:attr(inData, "sites")) %in% inData$siteID)){
+    missingSites <- setdiff(paste0("site_",1:attr(inData, "sites")), inData$siteID)
+    siteNum2remove <- attr(inData, "sites")
+    warning("At least one site has no records in the input data")
+    # we need to renumber the sites
+    # what we'll do is sequentially renumber the
+    while(length(missingSites) > 0){
+      inData$siteID <- gsub(inData$siteID,
+                            pa = paste0("site_", siteNum2remove),
+                            repl = missingSites[1])
+      print(paste0("renaming site_", siteNum2remove, " as ", missingSites[1]))
+      siteNum2remove <- siteNum2remove - 1
+      missingSites <- missingSites[-1]
+    }
   }
   if(any(!1:attr(inData, "years") %in% inData$year)){
     missingYear <- setdiff(1:attr(inData, "years"), inData$year)
