@@ -283,15 +283,20 @@ runModel <- function(dataConstants,
     mData <- with(dataConstants, data.frame(site=site, year=year))
     mData <- melt(cbind(mData, totalObs), id=1:2)
     names(mData)[3] <- "species"
+    # NB mData has one row per round
 
-    #mod <- lme4::glmer(value ~ year + species + site + (year|species), data = mData, family = "poisson")
-    mod <- lme4::lmList(value ~ year + factor(site) | species, data = mData, family = "poisson")
-
-    yearEff <- coef(mod)$year
-    names(yearEff) <- paste0("species", unique(mData$species))
-    #names(yearEff) <- paste0("Year", 1:dataConstants$nyear)
-  }
+    yearEff <- t(sapply(unique(mData$species), function(sp){
+      spDat <- subset(mData, species == sp)
+      #subset to the sites with >0 observations
+      occSites <- which(acast(spDat, site~., value.var="value", sum) > 0)
+      mod <- glm(value ~ year + factor(site),
+                 data = subset(spDat, site %in% occSites),
+                 family = "poisson")
+      return(as.numeric(summary(mod)$coefficients["year",1:2]))
+    }))
+    dimnames(yearEff)[[2]] <- c("Estimate", "Std. Error")
+    dimnames(yearEff)[[1]] <- paste0("species", dimnames(obsData$y2)[[1]])
 
   return(yearEff)
+  }
 }
-

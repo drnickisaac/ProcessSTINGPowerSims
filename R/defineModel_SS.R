@@ -34,7 +34,7 @@ defineModel_SS <- function(incl2ndTransect = TRUE,
       sd.eta ~ T(dt(0, 1, 1), 0, 10) # constrained
     }
     Trend ~ dnorm(0, tau=0.001)
-    lam.0 ~ dnorm(0, tau=1/2.72)
+    lam.0 ~ dnorm(0, tau=3) # highly constrained
 
     ######################### Obs model
     for(k in 1:nvisit) {
