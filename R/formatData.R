@@ -65,7 +65,7 @@ formatData <- function(inData,
   sp_n_Site <- rowSums(sp_site)
   sp2incl <- which(sp_n_Site > minSite)
   nExcl <- length(sp_n_Site) - length(sp2incl)
-  print(paste('Note:',nExcl,'species out of', length(sp_n_Site), 'have been excluded because they occur on fewer than', minSite, 'sites'))
+  print(paste('Note:',nExcl,'species out of', length(sp_n_Site), 'have been excluded because they occur on', minSite, 'sites or fewer'))
   if(length(sp2incl) > 0) {
     print(paste('We proceed to modelling with', length(sp2incl), 'species'))
   } else {
