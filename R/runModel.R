@@ -297,6 +297,6 @@ runModel <- function(dataConstants,
     dimnames(yearEff)[[2]] <- c("Estimate", "Std. Error")
     dimnames(yearEff)[[1]] <- paste0("species", dimnames(obsData$y2)[[1]])
 
-  return(yearEff)
   }
+  return(yearEff)
 }
