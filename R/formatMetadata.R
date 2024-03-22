@@ -9,19 +9,21 @@
 
 formatMetadata <- function(indat,
                            incl2ndTransect = TRUE,
-                           inclPanTrap = TRUE){
+                           inclPanTrap = TRUE,
+                           trueTrend = NULL,
+                           spPool = NULL){
   nTr <- ifelse(incl2ndTransect, as.numeric(attr(indat, "transects")), 1)
   pans <- ifelse(inclPanTrap, attr(indat, "pantraps"), FALSE)
 
   list(simpars = data.frame(
-        trend = attr(indat, "trend"),
-        pantraps = pans,
-        transects = nTr,
-        rounds = attr(indat, "rounds"),
-        sites = length(unique(indat$siteID)),
-        years = attr(indat, "years"),
-        sp_pool = attr(indat, "sp_pool")
-      ),
-      datastr = list(sp_obs = length(unique(indat$species)))
-    )
+                trend = trueTrend,
+                pantraps = pans,
+                transects = nTr,
+                rounds = length(unique(indat$round)),
+                sites = length(unique(indat$siteID)),
+                years = length(unique(indat$year)),
+                sp_pool = spPool
+                ),
+  datastr = list(sp_obs = length(unique(indat$species)))
+  )
 }

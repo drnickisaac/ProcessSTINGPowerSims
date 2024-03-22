@@ -4,7 +4,13 @@
 \alias{formatMetadata}
 \title{Format Metadata}
 \usage{
-formatMetadata(indat, incl2ndTransect = TRUE, inclPanTrap = TRUE)
+formatMetadata(
+  indat,
+  incl2ndTransect = TRUE,
+  inclPanTrap = TRUE,
+  trueTrend = NULL,
+  spPool = NULL
+)
 }
 \arguments{
 \item{indat}{A dataset produced by the simulations}

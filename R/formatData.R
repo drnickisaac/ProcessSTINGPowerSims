@@ -40,11 +40,14 @@ formatData <- function(inData,
   }
   #### data checks complete
 
-  ### now limit the data to MaxSite.
+  ### now limit the data to MaxSite whilst preserving the attributes that will be needed later.
   if(maxSite < length(unique(inData$siteID))){
     if(maxSite < 10) {maxSite <- 10}
-    inData <- subset(inData, siteID %in% paste0("site_",1:maxSite))
     print(paste("Subsetting the dataset to", maxSite,"sites"))
+    temp <- list(attr(inData, "trend"), attr(inData, "sp_pool"))
+    inData <- subset(inData, siteID %in% paste0("site_",1:maxSite))
+    attr(inData, "trend") <- temp[[1]]
+    attr(inData, "sp_pool") <- temp[[2]]
   }
 
   castDat <- dcast(inData, year + round + siteID + jday + total_pantraps ~ "nsp",
@@ -73,7 +76,12 @@ formatData <- function(inData,
   }
 
   # create metadata object
-  md <- formatMetadata(inData, incl2ndTransect=incl2ndTransect, inclPanTrap=inclPanTrap)
+  md <- formatMetadata(inData,
+                       incl2ndTransect=incl2ndTransect,
+                       inclPanTrap=inclPanTrap,
+                       trueTrend = attr(inData, "trend"),
+                       spPool = attr(inData, "sp_pool"))
+
   md$datastr$sp_n_Site <- data.frame(species = names(sp_n_Site), nSite = as.numeric(sp_n_Site))
   md$settings <- list(sp_modelled = length(sp2incl),
                    minSite = minSite)
