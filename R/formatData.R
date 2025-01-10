@@ -47,7 +47,12 @@ formatData <- function(inData,
     temp <- list(attr(inData, "trend"), attr(inData, "sp_pool"))
     inData <- subset(inData, siteID %in% paste0("site_",1:maxSite))
     attr(inData, "trend") <- temp[[1]]
-    attr(inData, "sp_pool") <- temp[[2]]
+    attr(inData, "pantraps") <- temp[[2]]
+    attr(inData, "transects") <- temp[[3]]
+    attr(inData, "rounds") <- temp[[4]]
+    attr(inData, "sites") <- temp[[5]]
+    attr(inData, "years") <- temp[[6]]
+    attr(inData, "sp_pool") <- temp[[7]]
   }
 
   castDat <- dcast(inData, year + round + siteID + jday + total_pantraps ~ "nsp",
@@ -87,7 +92,7 @@ formatData <- function(inData,
                    minSite = minSite)
 
   dataConstants <- list(nsp = as.numeric(md$settings["sp_modelled"]),
-                        nsite = length(unique(inData$site)),
+                        nsite = length(unique(inData$siteID)),
                         nvisit = nrow(castDat),
                         nyear = md$simpars$years,
                         year = castDat$year,
