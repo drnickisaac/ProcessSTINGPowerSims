@@ -44,7 +44,10 @@ formatData <- function(inData,
   if(maxSite < length(unique(inData$siteID))){
     if(maxSite < 10) {maxSite <- 10}
     print(paste("Subsetting the dataset to", maxSite,"sites"))
-    temp <- list(attr(inData, "trend"), attr(inData, "sp_pool"))
+    temp <- list(attr(inData, "trend"), attr(inData, "pantraps"),
+                 attr(inData, "transects"), attr(inData, "rounds"),
+                 maxSite, attr(inData, "years"),
+                 attr(inData, "sp_pool"))
     inData <- subset(inData, siteID %in% paste0("site_",1:maxSite))
     attr(inData, "trend") <- temp[[1]]
     attr(inData, "pantraps") <- temp[[2]]
