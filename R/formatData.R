@@ -74,7 +74,7 @@ formatData <- function(inData,
   sp_site <- (acast(inData, species~siteID, value.var = "obs", function(x) max(x) > 0, fill = 0))
 
   sp_n_Site <- rowSums(sp_site)
-  sp2incl <- which(sp_n_Site > minSite)
+  sp2incl <- which(sp_n_Site >= minSite)
   nExcl <- length(sp_n_Site) - length(sp2incl)
   print(paste('Note:',nExcl,'species out of', length(sp_n_Site), 'have been excluded because they occur on', minSite, 'sites or fewer'))
   if(length(sp2incl) > 0) {
