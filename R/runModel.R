@@ -10,6 +10,7 @@
 #' @param inclPhenology should the model account for seasonal variation?
 #' @param inclStateRE should there be a site-level random effect in the state model?
 #' @param multiSp should the model be run as a multispecies model, or many single-species models?
+#' @param community option to run a model of community metrics. Default is `FALSE`, which runs a separate model for each species. NB this only works if `Nimble = FALSE`
 #' @param parallelize should the chains be run as separate processes on different cores?
 #' @param allPars if `TRUE` then all model parameters are monitored. If `FALSE`, just `lam.0bda` and `Trend`.
 #' @param n.iter number of iterations for the Nimble model. Default is 1000.
@@ -35,6 +36,7 @@ runModel <- function(dataConstants,
                      inclPhenology = TRUE,
                      inclStateRE = FALSE,
                      multiSp = FALSE,
+                     community = FALSE,
                      parallelize = FALSE,
                      allPars = FALSE,
                      n.iter = 1000,
@@ -278,6 +280,7 @@ runModel <- function(dataConstants,
   }
   else {
     # for simplicity, let's just report the annual total count across all data types
+    # first step is to combine the obervations across data types
     totalObs <- sapply(1:maxSp, function(i) rowSums(sapply(obsData, function(x) x[i,])))
 
     mData <- with(dataConstants, data.frame(site=site, year=year))
@@ -285,18 +288,49 @@ runModel <- function(dataConstants,
     names(mData)[3] <- "species"
     # NB mData has one row per round
 
-    yearEff <- t(sapply(unique(mData$species), function(sp){
-      spDat <- subset(mData, species == sp)
-      #subset to the sites with >0 observations
-      occSites <- which(acast(spDat, site~., value.var="value", sum) > 0)
-      mod <- glm(value ~ year + factor(site),
-                 data = subset(spDat, site %in% occSites),
-                 family = "poisson")
-      return(as.numeric(summary(mod)$coefficients["year",1:2]))
-    }))
-    dimnames(yearEff)[[2]] <- c("Estimate", "Std. Error")
-    dimnames(yearEff)[[1]] <- paste0("species", dimnames(obsData$y2)[[1]])
+    if(!community){
+      yearEff <- t(sapply(unique(mData$species), function(sp){
+        # NB We are not aggregating across rounds at this point: we are treating them as replicate observations
+        spDat <- subset(mData, species == sp)
+        #subset to the sites with >0 observations
+        occSites <- which(acast(spDat, site~., value.var="value", sum) > 0)
+        mod <- glm(value ~ year + factor(site),
+                   data = subset(spDat, site %in% occSites),
+                   family = "poisson")
+        return(as.numeric(summary(mod)$coefficients["year",1:2]))
+      }))
+      dimnames(yearEff)[[2]] <- c("Estimate", "Std. Error")
+      dimnames(yearEff)[[1]] <- paste0("species", dimnames(obsData$y2)[[1]])
+    } else {
+      # a set of community models
+      # first step is to aggregate across rounds
+      cData <- dcast(mData, site + year + species ~ "nObs", fun = sum)
 
+      richness <- cData %>%
+        group_by(site, year) %>%
+        filter(nObs > 0) %>%
+        count()
+
+     diversity <- cData %>%
+        group_by(site, year) %>%
+        filter(nObs > 0) %>%
+        #mutate(richness = count()) %>%
+        mutate(p = nObs/sum(nObs)) %>%
+        summarise(totalN = sum(nObs),
+                  shannon = - sum(p * log(p)),
+                  simpson = sum(nObs*(nObs-1))/(sum(nObs)*sum(nObs-1)))
+
+     diversity$richness <- richness$n
+
+     models <- list(
+        richness = glm(richness ~ year + factor(site), "poisson", data = diversity),
+        totalN = glm(totalN ~ year + factor(site), "poisson", data = diversity),
+        shannon = lm(shannon ~ year + factor(site), data = diversity),
+        simpson = glm(simpson ~ year + factor(site), "quasibinomial", data = diversity)
+     )
+     yearEff <- t(sapply(models, function(mod) summary(mod)$coef["year",]))
+
+     }
   }
   return(yearEff)
 }

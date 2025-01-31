@@ -12,6 +12,7 @@
 #' @param inclPhenology should the model account for seasonal variation?
 #' @param inclStateRE should there be a site-level random effect in the state model?
 #' @param multiSp should the model be run for each species separately, or in a single model?
+#' @param community option to run a model of community metrics. Default is `FALSE`, which runs a separate model for each species
 #' @param parallelize option to parallelize across MCMC chains
 #' @param allPars if `TRUE` then all model parameters are monitored. If `FALSE`, just `mu.lambda` and `Trend`.
 #' @param n.iter number of iterations for the Nimble model. Default is 1000.
@@ -34,6 +35,7 @@ ProcessSimDatFile <- function(filename,
                               inclPanTrap = TRUE,
                               inclStateRE = FALSE,
                               multiSp = FALSE,
+                              community = FALSE,
                               parallelize = FALSE,
                               allPars = FALSE,
                               n.iter = 1000,
@@ -63,6 +65,8 @@ ProcessSimDatFile <- function(filename,
   print(paste("Successfully read in", filename))
 
   # format the data (includes removing species found on few sites)
+  # but only if we are modelling species: if community then override the minSite argument
+  if(community == TRUE & minSite != 0) minSite <- 0
   formattedData <- formatData(indata, minSite = minSite, maxSite = maxSite,
                               inclPanTrap = inclPanTrap,
                               incl2ndTransect = incl2ndTransect)
@@ -84,6 +88,7 @@ ProcessSimDatFile <- function(filename,
                        inclPhenology = inclPhenology,
                        inclStateRE = inclStateRE,
                        multiSp = multiSp,
+                       community = community,
                        parallelize = parallelize,
                        allPars = allPars,
                        n.iter = n.iter,
@@ -117,6 +122,7 @@ ProcessSimDatFile <- function(filename,
                                            inclPhenology = inclPhenology,
                                            inclStateRE = inclStateRE,
                                            multiSp = multiSp,
+                                           community = community,
                                            parallelize = parallelize,
                                            n.iter = n.iter,
                                            n.burn = n.burn,

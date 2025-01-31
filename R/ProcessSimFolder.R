@@ -13,6 +13,7 @@
 #' @param inclPhenology should the model account for seasonal variation?
 #' @param inclStateRE should there be a site-level random effect in the state model?
 #' @param multiSp should the model be run for species separately, or in a multispecies model?
+#' @param community option to run a model of community metrics. Default is `FALSE`, which runs a separate model for each species
 #' @param parallelize option to parallelize across MCMC chains
 #' @param allPars if `TRUE` then all model parameters are monitored. If `FALSE`, just `mu.lambda` and `Trend`.
 #' @param n.iter number of iterations for the Nimble model. Default is 1000.
@@ -36,6 +37,7 @@ ProcessSimFolder <- function(inPath = ".",
                             inclPhenology = TRUE,
                             inclStateRE = TRUE,
                             multiSp = FALSE,
+                            community = FALSE,
                             parallelize = FALSE,
                             allPars = FALSE,
                             n.iter = 1000,
@@ -81,6 +83,7 @@ ProcessSimFolder <- function(inPath = ".",
                    n.thin = n.thin,
                    n.chain = n.chain,
                    multiSp = multiSp,
+                   community = community,
                    minSite = minSite,
                    maxSp = maxSp,
                    maxSite = maxSite)
